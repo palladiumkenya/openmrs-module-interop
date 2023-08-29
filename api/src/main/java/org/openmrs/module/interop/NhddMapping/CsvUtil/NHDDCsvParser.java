@@ -16,11 +16,11 @@ import java.util.List;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 
-public class CsvParser {
+public class NHDDCsvParser {
 	
 	private File fileName;
 	
-	public CsvParser(File fileName) {
+	public NHDDCsvParser(File fileName) {
 		this.fileName = fileName;
 	}
 	

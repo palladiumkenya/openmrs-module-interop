@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.openmrs.Concept;
 import org.openmrs.module.fhir2.api.translators.impl.ConceptTranslatorImpl;
-import org.openmrs.module.interop.NhddMapping.CsvUtil.CsvParser;
+import org.openmrs.module.interop.NhddMapping.CsvUtil.NHDDCsvParser;
 import org.openmrs.module.interop.NhddMapping.CsvUtil.NHDDConceptMapDTO;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -80,7 +80,7 @@ public class InteropConceptTranslatorImpl extends ConceptTranslatorImpl {
 			URL resource = this.getClass().getClassLoader().getResource("metadata/NHDDConceptMapping.csv");
 			File file = Paths.get(resource.toURI()).toFile();
 			
-			CsvParser parser = new CsvParser(file);
+			NHDDCsvParser parser = new NHDDCsvParser(file);
 			
 			try {
 				concepts = parser.getConcepts();
