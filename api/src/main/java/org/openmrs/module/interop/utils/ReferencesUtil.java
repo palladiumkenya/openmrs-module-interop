@@ -24,6 +24,7 @@ import org.openmrs.Provider;
 import org.openmrs.ProviderAttribute;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.interop.InteropConstant;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -44,6 +45,21 @@ public class ReferencesUtil {
 				        .setValue(mflCodeAttribute.get(0).getValue().toString()).setUse(Identifier.IdentifierUse.OFFICIAL);
 			}
 		}
+	}
+	
+	public static Reference buildKhmflLocationReference(@NotNull Location location) {
+		Reference locationRef = new Reference(ObserverUtils.getKhmflSystemUrlConfiguration()).setType("Organization");
+		if (ObserverUtils.getMFLCODELocationAttributeType() != null) {
+			String mflCodeUuid = ObserverUtils.getMFLCODELocationAttributeType().getUuid();
+			List<LocationAttribute> mflCodeAttribute = location.getActiveAttributes().stream()
+			        .filter(loc -> loc.getAttributeType().getUuid().equals(mflCodeUuid)).collect(Collectors.toList());
+			if (!mflCodeAttribute.isEmpty()) {
+				locationRef.setIdentifier(new Identifier().setSystem(ObserverUtils.getKhmflSystemUrlConfiguration())
+				        .setValue(mflCodeAttribute.get(0).getValue().toString()).setUse(Identifier.IdentifierUse.OFFICIAL));
+				
+			}
+		}
+		return locationRef;
 	}
 	
 	public static List<Resource> resolveProvenceReference(List<Resource> resources, @NotNull Encounter encounter) {
@@ -104,13 +120,14 @@ public class ReferencesUtil {
 		return identifier;
 	}
 	
-	public static Identifier buildPatientUpiIdentifier(@NotNull Patient patient) {
+	public static Reference buildPatientReference(@NotNull Patient patient) {
+		Reference reference = new Reference(ObserverUtils.getCRSystemUrlConfiguration()).setType("Patient");
 		Identifier identifier = new Identifier();
-		identifier.setSystem(ObserverUtils.getSystemUrlConfiguration());
+		identifier.setSystem(ObserverUtils.getCRSystemUrlConfiguration());
 		identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
 		identifier.setValue(getPatientNUPI(patient));
-		
-		return identifier;
+		reference.setIdentifier(identifier);
+		return reference;
 	}
 	
 	private static String getPatientNUPI(Patient patient) {

@@ -52,7 +52,6 @@ public class DiagnosticReportTranslatorImpl implements DiagnosticReportTranslato
 		diagnosticReport.setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
 		diagnosticReport.setIssued(encounter.getEncounterDatetime());
 		diagnosticReport.setSubject(patientReferenceTranslator.toFhirResource(encounter.getPatient()));
-		diagnosticReport.getSubject().setIdentifier(ReferencesUtil.buildPatientUpiIdentifier(encounter.getPatient()));
 		
 		diagnosticReport.addResultsInterpreter(practitionerReferenceTranslator.toFhirResource(encounter.getCreator()));
 		diagnosticReport.getResultsInterpreterFirstRep()

@@ -105,9 +105,9 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		Bundle preparedBundle = new Bundle();
 		
 		org.hl7.fhir.r4.model.Encounter fhirEncounter = encounterTranslator.toFhirResource(encounter);
-		fhirEncounter.getSubject().setIdentifier(ReferencesUtil.buildPatientUpiIdentifier(encounter.getPatient()));
+		fhirEncounter.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 		org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent locationComponent = new org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent();
-		ReferencesUtil.buildLocationReference(encounter.getLocation(), locationComponent.getLocation());
+		locationComponent.setLocation(ReferencesUtil.buildKhmflLocationReference(encounter.getLocation()));
 		fhirEncounter.setLocation(Collections.singletonList(locationComponent));
 		fhirEncounter.getParticipantFirstRep().getIndividual().setIdentifier(buildProviderIdentifier(encounter));
 		
@@ -130,7 +130,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			Observation fhirObs = observationTranslator.toFhirResource(obs);
 			fhirObs.addIdentifier(new Identifier().setSystem(InteropConstant.SYSTEM_URL).setValue(obs.getUuid())
 			        .setUse(Identifier.IdentifierUse.OFFICIAL));
-			fhirObs.getSubject().setIdentifier(ReferencesUtil.buildPatientUpiIdentifier(encounter.getPatient()));
+			fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			
 			// provence references
 			List<Resource> resources = ReferencesUtil.resolveProvenceReference(fhirObs.getContained(), encounter);
@@ -205,7 +205,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		
 		List<Condition> conditions = conditionProcessor.process(encounter);
 		conditions.forEach(condition -> {
-			condition.getSubject().setIdentifier(ReferencesUtil.buildPatientUpiIdentifier(encounter.getPatient()));
+			condition.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			condition.getRecorder().setIdentifier(buildProviderIdentifier(encounter));
 			condition.setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
 			
@@ -223,8 +223,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			//appointment.setContained(resources);
 			
 			for (Appointment.AppointmentParticipantComponent participantComponent : appointment.getParticipant()) {
-				participantComponent.getActor()
-				        .setIdentifier(ReferencesUtil.buildPatientUpiIdentifier(encounter.getPatient()));
+				participantComponent.setActor(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			}
 			bundle.addEntry(createAppointmentBundleComponent(appointment));
 		});
@@ -232,12 +231,13 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		List<DiagnosticReport> diagnosticReports = diagnosticReportProcessor.process(encounter);
 		if (!diagnosticReports.isEmpty()) {
 			diagnosticReports.get(0).setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
+			diagnosticReports.get(0).setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			bundle.addEntry(createDiagnosticReportComponent(diagnosticReports.get(0)));
 		}
 		
 		List<AllergyIntolerance> allergyIntolerancesList = allergyIntoleranceProcessor.process(encounter);
 		allergyIntolerancesList.forEach(allergy -> {
-			allergy.getPatient().setIdentifier(ReferencesUtil.buildPatientUpiIdentifier(encounter.getPatient()));
+			allergy.setPatient(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			allergy.setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
 			bundle.addEntry(createAllergyComponent(allergy));
 		});
