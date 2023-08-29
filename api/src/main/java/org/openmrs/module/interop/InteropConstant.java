@@ -27,6 +27,10 @@ public class InteropConstant {
 	
 	public static String SYSTEM_URL = "interop.system.url.configuration";
 	
+	public static String CR_SYSTEM_URL = "interop.cr.system.url.configuration";
+	
+	public static String KMHFL_SYSTEM_URL = "interop.kmhfl.system.url.configuration";
+	
 	public static String APPOINTMENT_PROCESSOR_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.appointments";
 	
 	public static String APPOINTMENT_WITH_CODED_TYPES = "interop.appointmentWithCodedTypes";

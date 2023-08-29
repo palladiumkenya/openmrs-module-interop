@@ -60,4 +60,12 @@ public class ObserverUtils {
 		return Context.getAdministrationService().getGlobalPropertyValue(InteropConstant.SYSTEM_URL, "");
 	}
 	
+	public static String getCRSystemUrlConfiguration() {
+		return Context.getAdministrationService().getGlobalPropertyValue(InteropConstant.CR_SYSTEM_URL, "");
+	}
+	
+	public static String getKhmflSystemUrlConfiguration() {
+		return Context.getAdministrationService().getGlobalPropertyValue(InteropConstant.KMHFL_SYSTEM_URL, "");
+	}
+	
 }

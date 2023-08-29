@@ -198,5 +198,15 @@
 		<description>coma separated list of treatment plan(concept questions)</description>
 		<defaultValue></defaultValue>
 	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.cr.system.url.configuration</property>
+		<description>CR System Configuration URL</description>
+		<defaultValue>https://dhpstagingapi.health.go.ke/partners/registry/search/upi/</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.kmhfl.system.url.configuration</property>
+		<description>KMHFL System Configuration URL</description>
+		<defaultValue>https://api.kmhfl.health.go.ke/api/</defaultValue>
+	</globalProperty>
 	
 </module>
