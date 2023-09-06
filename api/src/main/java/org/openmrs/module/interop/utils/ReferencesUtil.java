@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Provenance;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.Location;
@@ -48,6 +49,21 @@ public class ReferencesUtil {
 	}
 	
 	public static Reference buildKhmflLocationReference(@NotNull Location location) {
+		Reference locationRef = new Reference(ObserverUtils.getKhmflSystemUrlConfiguration()).setType("Location");
+		if (ObserverUtils.getMFLCODELocationAttributeType() != null) {
+			String mflCodeUuid = ObserverUtils.getMFLCODELocationAttributeType().getUuid();
+			List<LocationAttribute> mflCodeAttribute = location.getActiveAttributes().stream()
+			        .filter(loc -> loc.getAttributeType().getUuid().equals(mflCodeUuid)).collect(Collectors.toList());
+			if (!mflCodeAttribute.isEmpty()) {
+				locationRef.setIdentifier(new Identifier().setSystem(ObserverUtils.getKhmflSystemUrlConfiguration())
+				        .setValue(mflCodeAttribute.get(0).getValue().toString()).setUse(Identifier.IdentifierUse.OFFICIAL));
+				
+			}
+		}
+		return locationRef;
+	}
+	
+	public static Reference buildKhmflOrganizationReference(@NotNull Location location) {
 		Reference locationRef = new Reference(ObserverUtils.getKhmflSystemUrlConfiguration()).setType("Organization");
 		if (ObserverUtils.getMFLCODELocationAttributeType() != null) {
 			String mflCodeUuid = ObserverUtils.getMFLCODELocationAttributeType().getUuid();
@@ -126,6 +142,16 @@ public class ReferencesUtil {
 		identifier.setSystem(ObserverUtils.getCRSystemUrlConfiguration());
 		identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
 		identifier.setValue(getPatientNUPI(patient));
+		reference.setIdentifier(identifier);
+		return reference;
+	}
+	
+	public static Reference buildServiceRequestReference(@NotNull ServiceRequest request) {
+		Reference reference = new Reference(ObserverUtils.getCRSystemUrlConfiguration()).setType("ServiceRequest");
+		Identifier identifier = new Identifier();
+		identifier.setSystem(ObserverUtils.getCRSystemUrlConfiguration());
+		identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
+		identifier.setValue(request.getId());
 		reference.setIdentifier(identifier);
 		return reference;
 	}

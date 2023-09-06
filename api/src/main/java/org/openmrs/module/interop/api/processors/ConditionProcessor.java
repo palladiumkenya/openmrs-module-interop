@@ -24,6 +24,7 @@ import org.openmrs.module.fhir2.api.translators.ConceptTranslator;
 import org.openmrs.module.interop.InteropConstant;
 import org.openmrs.module.interop.api.InteropProcessor;
 import org.openmrs.module.interop.api.processors.translators.ConditionObsTranslator;
+import org.openmrs.module.interop.utils.ObserverUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -89,7 +90,7 @@ public class ConditionProcessor implements InteropProcessor<Encounter> {
 							
 							Extension extension = new Extension();
 							extension.setValue(treatmentPlan);
-							extension.setUrl(InteropConstant.SYSTEM_URL);
+							extension.setUrl(ObserverUtils.getSystemUrlConfiguration());
 							
 							condition.addExtension(extension);
 						}

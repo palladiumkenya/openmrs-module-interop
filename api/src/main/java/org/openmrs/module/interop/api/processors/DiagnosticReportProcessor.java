@@ -77,8 +77,6 @@ public class DiagnosticReportProcessor implements InteropProcessor<Encounter> {
 		if (!resultObs.isEmpty()) {
 			for (Obs obs : resultObs) {
 				Reference observation = observationReferenceTranslator.toFhirResource(obs);
-				observation.setIdentifier(new Identifier().setSystem(InteropConstant.SYSTEM_URL).setValue(obs.getUuid())
-				        .setUse(Identifier.IdentifierUse.OFFICIAL));
 				diagnosticReport.addResult(observation);
 			}
 		} else {
