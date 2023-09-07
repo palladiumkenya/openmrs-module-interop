@@ -17,6 +17,7 @@ import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openmrs.Encounter;
@@ -103,13 +104,15 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		//Create bundle
 		Encounter encounter = Context.getEncounterService().getEncounterByUuid(metadata.getString("uuid"));
 		Bundle preparedBundle = new Bundle();
+		preparedBundle.setType(Bundle.BundleType.TRANSACTION);
 		
 		org.hl7.fhir.r4.model.Encounter fhirEncounter = encounterTranslator.toFhirResource(encounter);
 		fhirEncounter.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 		org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent locationComponent = new org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent();
 		locationComponent.setLocation(ReferencesUtil.buildKhmflLocationReference(encounter.getLocation()));
 		fhirEncounter.setLocation(Collections.singletonList(locationComponent));
-		fhirEncounter.getParticipantFirstRep().getIndividual().setIdentifier(buildProviderIdentifier(encounter));
+		fhirEncounter.getParticipant().clear();
+		fhirEncounter.setPartOf(new Reference());
 		
 		List<Resource> encounterContainedResources = ReferencesUtil.resolveProvenceReference(fhirEncounter.getContained(),
 		    encounter);
@@ -124,12 +127,11 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		encounterBundleEntryComponent.setResource(fhirEncounter);
 		preparedBundle.addEntry(encounterBundleEntryComponent);
 		
+		/* Todo: Specify which observations to include */
 		//Observations
 		List<Obs> encounterObservations = new ArrayList<>(encounter.getObs());
 		for (Obs obs : encounterObservations) {
 			Observation fhirObs = observationTranslator.toFhirResource(obs);
-			fhirObs.addIdentifier(new Identifier().setSystem(InteropConstant.SYSTEM_URL).setValue(obs.getUuid())
-			        .setUse(Identifier.IdentifierUse.OFFICIAL));
 			fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			
 			// provence references
@@ -143,7 +145,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			requestComponent.setUrl("Observation/" + fhirObs.getId());
 			obsBundleEntry.setRequest(requestComponent);
 			obsBundleEntry.setResource(fhirObs);
-			//preparedBundle.addEntry(obsBundleEntry);
+			preparedBundle.addEntry(obsBundleEntry);
 		}
 		
 		this.processFhirResources(encounter, preparedBundle);
@@ -172,8 +174,8 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	
 	private Bundle.BundleEntryComponent createAppointmentRequestBundleComponent(ServiceRequest serviceRequest) {
 		Bundle.BundleEntryRequestComponent bundleEntryRequestComponent = new Bundle.BundleEntryRequestComponent();
-		bundleEntryRequestComponent.setMethod(Bundle.HTTPVerb.POST);
-		bundleEntryRequestComponent.setUrl("ServiceRequest");
+		bundleEntryRequestComponent.setMethod(Bundle.HTTPVerb.PUT);
+		bundleEntryRequestComponent.setUrl("ServiceRequest/" + serviceRequest.getId());
 		Bundle.BundleEntryComponent bundleEntryComponent = new Bundle.BundleEntryComponent();
 		bundleEntryComponent.setRequest(bundleEntryRequestComponent);
 		bundleEntryComponent.setResource(serviceRequest);
@@ -201,7 +203,6 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	}
 	
 	private void processFhirResources(@Nonnull Encounter encounter, @NotNull Bundle bundle) {
-		bundle.addEntry(createAppointmentRequestBundleComponent(appointmentRequestTranslator.toFhirResource(encounter)));
 		
 		List<Condition> conditions = conditionProcessor.process(encounter);
 		conditions.forEach(condition -> {
@@ -217,16 +218,26 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		});
 		
 		List<Appointment> appointments = appointmentProcessor.process(encounter);
-		appointments.forEach(appointment -> {
-			List<Resource> resources = ReferencesUtil.resolveProvenceReference(appointment.getContained(), encounter);
-			appointment.getContained().clear();
-			//appointment.setContained(resources);
+		if (!appointments.isEmpty()) {
+			ServiceRequest serviceRequest = appointmentRequestTranslator.toFhirResource(encounter);
+			serviceRequest.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+			Reference locationRef = ReferencesUtil.buildKhmflOrganizationReference(encounter.getLocation());
+			serviceRequest.setRequester(locationRef);
+			bundle.addEntry(createAppointmentRequestBundleComponent(serviceRequest));
 			
-			for (Appointment.AppointmentParticipantComponent participantComponent : appointment.getParticipant()) {
-				participantComponent.setActor(ReferencesUtil.buildPatientReference(encounter.getPatient()));
-			}
-			bundle.addEntry(createAppointmentBundleComponent(appointment));
-		});
+			appointments.forEach(appointment -> {
+				List<Resource> resources = ReferencesUtil.resolveProvenceReference(appointment.getContained(), encounter);
+				appointment
+				        .setBasedOn(Collections.singletonList(ReferencesUtil.buildServiceRequestReference(serviceRequest)));
+				appointment.getContained().clear();
+				appointment.setContained(resources);
+				
+				for (Appointment.AppointmentParticipantComponent participantComponent : appointment.getParticipant()) {
+					participantComponent.setActor(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+				}
+				bundle.addEntry(createAppointmentBundleComponent(appointment));
+			});
+		}
 		
 		List<DiagnosticReport> diagnosticReports = diagnosticReportProcessor.process(encounter);
 		if (!diagnosticReports.isEmpty()) {
