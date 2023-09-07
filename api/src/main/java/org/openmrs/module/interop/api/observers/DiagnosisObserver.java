@@ -10,7 +10,7 @@
 package org.openmrs.module.interop.api.observers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openmrs.Condition;
+import org.openmrs.Diagnosis;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
 import org.openmrs.event.Event;
@@ -26,15 +26,15 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Slf4j
-@Component("interop.conditionCreationObserver")
-public class ConditionObserver extends BaseObserver implements Subscribable<Condition> {
+@Component("interop.diagnosisCreationObserver")
+public class DiagnosisObserver extends BaseObserver implements Subscribable<Diagnosis> {
 
     @Autowired
-    private InteropConditionTranslator<Condition> conditionTranslator;
+    private InteropConditionTranslator<Diagnosis> diagnosisTranslator;
 
     @Override
     public Class<?> clazz() {
-        return Condition.class;
+        return Diagnosis.class;
     }
 
     @Override
@@ -45,16 +45,16 @@ public class ConditionObserver extends BaseObserver implements Subscribable<Cond
     @Override
     public void onMessage(Message message) {
         processMessage(message)
-                .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareConditionsMessage(metadata), getDaemonToken()));
+                .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareDiagnosisMessage(metadata), getDaemonToken()));
     }
 
-    private void prepareConditionsMessage(@NotNull EventMetadata metadata) {
-        Condition condition = Context.getConditionService().getConditionByUuid(metadata.getString("uuid"));
-        org.hl7.fhir.r4.model.Condition fhirCondition = conditionTranslator.toFhirResource(condition);
+    private void prepareDiagnosisMessage(@NotNull EventMetadata metadata) {
+        Diagnosis diagnosis = Context.getDiagnosisService().getDiagnosisByUuid(metadata.getString("uuid"));
+        org.hl7.fhir.r4.model.Condition fhirCondition = diagnosisTranslator.toFhirResource(diagnosis);
         if (fhirCondition != null) {
             this.publish(fhirCondition);
         } else {
-            log.error("Couldn't find condition with UUID {} ", metadata.getString("uuid"));
+            log.error("Couldn't find diagnosis with UUID {} ", metadata.getString("uuid"));
         }
     }
 }

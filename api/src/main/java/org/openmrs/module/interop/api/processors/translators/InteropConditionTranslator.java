@@ -13,5 +13,5 @@ import org.hl7.fhir.r4.model.Condition;
 import org.openmrs.Obs;
 import org.openmrs.module.fhir2.api.translators.ToFhirTranslator;
 
-public interface InteropConditionTranslator extends ToFhirTranslator<org.openmrs.Condition, Condition> {
+public interface InteropConditionTranslator<T> extends ToFhirTranslator<T, Condition> {
 }

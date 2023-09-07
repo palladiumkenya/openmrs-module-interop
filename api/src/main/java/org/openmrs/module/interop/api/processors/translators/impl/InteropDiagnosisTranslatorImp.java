@@ -13,7 +13,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.openmrs.Auditable;
-import org.openmrs.Condition;
+import org.openmrs.Diagnosis;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.module.fhir2.api.translators.ConceptTranslator;
@@ -26,8 +26,8 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Date;
 
-@Component("interop.interopConditionTranslator")
-public class InteropConditionTranslatorImpl implements InteropConditionTranslator<Condition> {
+@Component("interop.interopDiagnosisTranslator")
+public class InteropDiagnosisTranslatorImp implements InteropConditionTranslator<Diagnosis> {
 
     @Autowired
     private PatientReferenceTranslator patientReferenceTranslator;
@@ -36,31 +36,27 @@ public class InteropConditionTranslatorImpl implements InteropConditionTranslato
     private ConceptTranslator conceptTranslator;
 
     @Override
-    public org.hl7.fhir.r4.model.Condition toFhirResource(@Nonnull Condition condition) {
+    public org.hl7.fhir.r4.model.Condition toFhirResource(@Nonnull Diagnosis diagnosis) {
         org.hl7.fhir.r4.model.Condition fhirCondition = new org.hl7.fhir.r4.model.Condition();
-        fhirCondition.setId(condition.getUuid());
-        Patient patient = condition.getPatient();
+        fhirCondition.setId(diagnosis.getUuid());
+        Patient patient = diagnosis.getPatient();
         fhirCondition.setSubject(patientReferenceTranslator.toFhirResource(patient));
-        if (condition.getCondition() != null && condition.getCondition().getCoded() != null) {
-            fhirCondition.setCode(conceptTranslator.toFhirResource(condition.getCondition().getCoded()));
+        if (diagnosis.getDiagnosis() != null && diagnosis.getDiagnosis().getCoded() != null) {
+            fhirCondition.setCode(conceptTranslator.toFhirResource(diagnosis.getDiagnosis().getCoded()));
         }
-        if (condition.getClinicalStatus() != null) {
-            fhirCondition.setClinicalStatus(
-                    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-clinical",
-                            condition.getClinicalStatus().toString().toLowerCase(), condition.getClinicalStatus().toString())));
-        }
-        if (condition.getVerificationStatus() != null) {
+        fhirCondition.setClinicalStatus(new CodeableConcept()
+                .addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-clinical", "active", "ACTIVE")));
+        if (diagnosis.getCertainty() != null) {
             fhirCondition.setVerificationStatus(
                     new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-ver-status",
-                            condition.getVerificationStatus().toString().toLowerCase(),
-                            condition.getVerificationStatus().toString())));
+                            diagnosis.getCertainty().toString().toLowerCase(), diagnosis.getCertainty().toString())));
         }
-        Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category ", "conditions", "Conditions");
+        Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category ", "encounter-diagnosis",
+                "Encounter Diagnosis");
         fhirCondition.setCategory(Collections.singletonList(new CodeableConcept().addCoding(category)));
-        fhirCondition.setOnset(new DateTimeType().setValue(condition.getOnsetDate()));
-        fhirCondition.setRecordedDate(condition.getDateCreated());
-        fhirCondition.setAbatement(new DateTimeType().setValue(condition.getEndDate()));
-        fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(condition));
+        fhirCondition.setOnset(new DateTimeType().setValue(diagnosis.getDateCreated()));
+        fhirCondition.setRecordedDate(diagnosis.getDateCreated());
+        fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(diagnosis));
 
         return fhirCondition;
     }
