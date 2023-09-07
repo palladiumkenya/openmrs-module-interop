@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class OpenhimConnector implements Publisher {
 	
 	@Override
-	public void publish(@NotNull FhirContext context, @NotNull IAnyResource resource) {
+	public void publish(@NotNull FhirContext context, @NotNull IAnyResource resource, String serverToken) {
 		log.debug("publish resource with ID {}", resource.getId());
 		String encodeResourceString = "";
 		if (context != null) {
@@ -39,7 +39,7 @@ public class OpenhimConnector implements Publisher {
 			OpenhimConfiguration config = Context.getRegisteredComponent("interop.openhimConfiguration",
 			    OpenhimConfiguration.class);
 			OpenhimClient.postFhirResource(encodeResourceString,
-			    config.getOpenhimServerUrl() + "/" + resource.fhirType().toLowerCase());
+			    config.getOpenhimServerUrl() + "/" + resource.fhirType().toLowerCase(), serverToken);
 		}
 		catch (Exception e) {
 			log.error("Unable to post fhir resource", e);

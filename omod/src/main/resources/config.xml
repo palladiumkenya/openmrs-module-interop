@@ -208,5 +208,30 @@
 		<description>KMHFL System Configuration URL</description>
 		<defaultValue>https://api.kmhfl.health.go.ke/api/</defaultValue>
 	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.shr.token</property>
+		<description>The generated Oauth2 token</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.shr.token.url</property>
+		<description>Oauth2 token Url</description>
+		<defaultValue></defaultValue>>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.shr.oauth2.client.id</property>
+		<description>Oauth2 client id</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.shr.oauth2.client.secret</property>
+		<description>Oauth2 client secret</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.shr.oauth2.scope</property>
+		<description>Oauth2 client scope</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
 	
 </module>

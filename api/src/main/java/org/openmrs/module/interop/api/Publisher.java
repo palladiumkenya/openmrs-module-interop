@@ -21,7 +21,7 @@ public interface Publisher {
 	 *
 	 * @param resource Resource to be published.
 	 */
-	void publish(@NotNull FhirContext context, @NotNull IAnyResource resource);
+	void publish(@NotNull FhirContext context, @NotNull IAnyResource resource, String serverToken);
 	
 	/**
 	 * Publishes FHIR resource (Not JSON encoded)

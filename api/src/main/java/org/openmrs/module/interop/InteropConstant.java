@@ -59,4 +59,14 @@ public class InteropConstant {
 	
 	public static String LAB_RESULT_CONCEPT_UUID = "interop.labResults";
 	
+	public static final String GP_SHR_TOKEN = "interop.shr.token";
+	
+	public static final String GP_SHR_TOKEN_URL = "interop.shr.token.url";
+	
+	public static final String GP_SHR_OAUTH2_CLIENT_ID = "interop.shr.oauth2.client.id";
+	
+	public static final String GP_SHR_OAUTH2_CLIENT_SECRET = "interop.shr.oauth2.client.secret";
+	
+	public static final String GP_SHR_OAUTH2_SCOPE = "interop.shr.oauth2.scope";
+	
 }
