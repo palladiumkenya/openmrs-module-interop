@@ -17,16 +17,16 @@ import org.apache.http.impl.client.HttpClients;
 
 public class OpenhimClient {
 	
-	public static void postFhirResource(String fhirResource, String openHimUrl) throws Exception {
+	public static void postFhirResource(String fhirResource, String openHimUrl, String oauthToken) throws Exception {
 		HttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(openHimUrl);
-		String token = "Bearer ";
+		oauthToken = "Bearer " + oauthToken;
 		
 		/* Todo: Add Oauth2 logic and append to request headers */
 		StringEntity fhirResourceEntity = new StringEntity(fhirResource);
 		httpPost.setEntity(fhirResourceEntity);
 		httpPost.setHeader("Content-type", "application/json");
-		httpPost.setHeader("Authorization", token);
+		httpPost.setHeader("Authorization", oauthToken);
 		
 		HttpResponse response = httpClient.execute(httpPost);
 		int statusCode = response.getStatusLine().getStatusCode();

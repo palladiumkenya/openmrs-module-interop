@@ -28,6 +28,7 @@ import org.openmrs.module.DaemonToken;
 import org.openmrs.module.interop.api.Publisher;
 import org.openmrs.module.interop.api.metadata.EventMetadata;
 import org.openmrs.module.interop.utils.ClassUtils;
+import org.openmrs.module.interop.utils.OauthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -107,6 +108,7 @@ public abstract class BaseObserver {
 	}
 	
 	public void publish(@NotNull IAnyResource resource) {
+		OauthUtil oauthUtil = new OauthUtil();
 		log.error("Bundled resources :: {}",
 		    fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource));
 		
@@ -122,7 +124,7 @@ public abstract class BaseObserver {
 			// Publish to enabled connectors
 			if (newInstancePublisher.isEnabled()) {
 				log.info("Publishing resource with ID {} to {}", resource.getId(), publisher.getSimpleName());
-				newInstancePublisher.publish(fhirContext, resource);
+				newInstancePublisher.publish(fhirContext, resource, oauthUtil.getToken());
 			}
 		});
 	}

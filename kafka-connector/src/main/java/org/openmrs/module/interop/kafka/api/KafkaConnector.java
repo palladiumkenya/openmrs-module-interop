@@ -29,7 +29,7 @@ import java.util.UUID;
 public class KafkaConnector implements Publisher {
 	
 	@Override
-	public void publish(@NotNull FhirContext context, @NotNull IAnyResource resource) {
+	public void publish(@NotNull FhirContext context, @NotNull IAnyResource resource, String serverToken) {
 		log.error("publish resource with ID {}", resource.getId());
 		String encodeResourceString = context.newJsonParser().encodeResourceToString(resource);
 		if (encodeResourceString == null || encodeResourceString.isEmpty()) {
