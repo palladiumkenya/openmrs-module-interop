@@ -189,6 +189,16 @@
 		<defaultValue></defaultValue>
 	</globalProperty>
 	<globalProperty>
+		<property>@MODULE_ID@.vitalsConcepts</property>
+		<description>Coma separated list of vitals concepts(concept questions)</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.encounterTypes.vitals</property>
+		<description>Vitals enabled encounter types</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
 		<property>@MODULE_ID@.system.url.configuration</property>
 		<description>System Configuration URL</description>
 		<defaultValue>https://interoperabilitylab.uonbi.ac.ke/test/fhir-server/api/v4/</defaultValue>

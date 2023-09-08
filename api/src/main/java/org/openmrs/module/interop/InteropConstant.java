@@ -58,7 +58,12 @@ public class InteropConstant {
 	public static String LAB_RESULT_PROCESSOR_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.labResults";
 	
 	public static String LAB_RESULT_CONCEPT_UUID = "interop.labResults";
-	
+
+	public static String VITALS_PROCESSOR_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.vitals";
+
+	public static String VITAL_CONCEPT_UUIDS = "interop.vitalsConcepts";
+
+
 	public static final String GP_SHR_TOKEN = "interop.shr.token";
 	
 	public static final String GP_SHR_TOKEN_URL = "interop.shr.token.url";

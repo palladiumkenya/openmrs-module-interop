@@ -45,13 +45,13 @@ public class InteropDiagnosisTranslatorImp implements InteropConditionTranslator
             fhirCondition.setCode(conceptTranslator.toFhirResource(diagnosis.getDiagnosis().getCoded()));
         }
         fhirCondition.setClinicalStatus(new CodeableConcept()
-                .addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-clinical", "active", "ACTIVE")));
+                .addCoding(new Coding("http://terminology.hl7.org/CodeSystem/condition-clinical", "active", "ACTIVE")));
         if (diagnosis.getCertainty() != null) {
             fhirCondition.setVerificationStatus(
-                    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-ver-status",
+                    new CodeableConcept().addCoding(new Coding("http://terminology.hl7.org/CodeSystem/condition-ver-status",
                             diagnosis.getCertainty().toString().toLowerCase(), diagnosis.getCertainty().toString())));
         }
-        Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category ", "encounter-diagnosis",
+        Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category", "encounter-diagnosis",
                 "Encounter Diagnosis");
         fhirCondition.setCategory(Collections.singletonList(new CodeableConcept().addCoding(category)));
         fhirCondition.setOnset(new DateTimeType().setValue(diagnosis.getDateCreated()));

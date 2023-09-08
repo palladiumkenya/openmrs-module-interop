@@ -10,6 +10,7 @@
 package org.openmrs.module.interop.api.observers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Diagnosis;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
@@ -50,6 +51,7 @@ public class DiagnosisObserver extends BaseObserver implements Subscribable<Diag
 
     private void prepareDiagnosisMessage(@NotNull EventMetadata metadata) {
         Diagnosis diagnosis = Context.getDiagnosisService().getDiagnosisByUuid(metadata.getString("uuid"));
+        if (diagnosis.getCertainty() == null || diagnosis.getCertainty().equals(ConditionVerificationStatus.PROVISIONAL)) return;
         org.hl7.fhir.r4.model.Condition fhirCondition = diagnosisTranslator.toFhirResource(diagnosis);
         if (fhirCondition != null) {
             this.publish(fhirCondition);

@@ -33,6 +33,7 @@ import org.openmrs.module.interop.api.processors.AllergyIntoleranceProcessor;
 import org.openmrs.module.interop.api.processors.AppointmentProcessor;
 import org.openmrs.module.interop.api.processors.ConditionProcessor;
 import org.openmrs.module.interop.api.processors.DiagnosticReportProcessor;
+import org.openmrs.module.interop.api.processors.VitalsProcessor;
 import org.openmrs.module.interop.api.processors.translators.AppointmentRequestTranslator;
 import org.openmrs.module.interop.utils.ObserverUtils;
 import org.openmrs.module.interop.utils.ReferencesUtil;
@@ -78,6 +79,9 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	
 	@Autowired
 	private AllergyIntoleranceProcessor allergyIntoleranceProcessor;
+
+	@Autowired
+	private VitalsProcessor vitalsProcessor;
 	
 	@Override
 	public Class<?> clazz() {
@@ -131,18 +135,30 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		for (Obs obs : encounterObservations) {
 			Observation fhirObs = observationTranslator.toFhirResource(obs);
 			fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
-			
+   
 			// provence references
 			List<Resource> resources = ReferencesUtil.resolveProvenceReference(fhirObs.getContained(), encounter);
 			fhirObs.getContained().clear();
 			//fhirObs.setContained(resources);
-			
+   
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
 			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
 			requestComponent.setUrl("Observation/" + fhirObs.getId());
 			obsBundleEntry.setRequest(requestComponent);
 			obsBundleEntry.setResource(fhirObs);
+			preparedBundle.addEntry(obsBundleEntry);
+		}
+
+		//Vital obs
+		List<Observation> observationList = vitalsProcessor.process(encounter);
+		for (Observation obs : observationList) {
+			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
+			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
+			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
+			requestComponent.setUrl("Observation/" + obs.getId());
+			obsBundleEntry.setRequest(requestComponent);
+			obsBundleEntry.setResource(obs);
 			preparedBundle.addEntry(obsBundleEntry);
 		}
 		
