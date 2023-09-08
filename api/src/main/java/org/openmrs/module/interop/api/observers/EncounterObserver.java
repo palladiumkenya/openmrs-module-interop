@@ -36,6 +36,7 @@ import org.openmrs.module.interop.api.Subscribable;
 import org.openmrs.module.interop.api.metadata.EventMetadata;
 import org.openmrs.module.interop.api.processors.AllergyIntoleranceProcessor;
 import org.openmrs.module.interop.api.processors.AppointmentProcessor;
+import org.openmrs.module.interop.api.processors.ComplaintsProcessor;
 import org.openmrs.module.interop.api.processors.ConditionProcessor;
 import org.openmrs.module.interop.api.processors.DiagnosticReportProcessor;
 import org.openmrs.module.interop.api.processors.ServiceRequestProcessor;
@@ -90,6 +91,9 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 
 	@Autowired
 	private VitalsProcessor vitalsProcessor;
+
+	@Autowired
+	private ComplaintsProcessor complaintsProcessor;
 	
 	@Autowired
 	private ServiceRequestProcessor serviceRequestProcessor;
@@ -166,8 +170,20 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		}
 
 		//Vital obs
-		List<Observation> observationList = vitalsProcessor.process(encounter);
-		for (Observation obs : observationList) {
+		List<Observation> vitalsObs = vitalsProcessor.process(encounter);
+		for (Observation obs : vitalsObs) {
+			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
+			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
+			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
+			requestComponent.setUrl("Observation/" + obs.getId());
+			obsBundleEntry.setRequest(requestComponent);
+			obsBundleEntry.setResource(obs);
+			preparedBundle.addEntry(obsBundleEntry);
+		}
+
+		//Complaints obs
+		List<Observation> complaintsObs = vitalsProcessor.process(encounter);
+		for (Observation obs : complaintsObs) {
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
 			requestComponent.setMethod(Bundle.HTTPVerb.PUT);

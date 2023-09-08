@@ -81,6 +81,9 @@ public class InteropConstant {
 
 	public static String VITAL_CONCEPT_UUIDS = "interop.vitalsConcepts";
 
+	public static String COMPLAINTS_PROCESSOR_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.complaints";
+
+	public static String COMPLAINTS_CONCEPT_UUIDS = "interop.complaintsConcepts";
 
 	public static final String GP_SHR_TOKEN = "interop.shr.token";
 	
