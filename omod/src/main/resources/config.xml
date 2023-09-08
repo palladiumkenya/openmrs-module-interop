@@ -199,6 +199,16 @@
 		<defaultValue></defaultValue>
 	</globalProperty>
 	<globalProperty>
+		<property>@MODULE_ID@.complaintsConcepts</property>
+		<description>Coma separated list of complaints concepts(concept questions)</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.encounterTypes.complaints</property>
+		<description>Complaints encounter types enabled</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
 		<property>@MODULE_ID@.system.url.configuration</property>
 		<description>System Configuration URL</description>
 		<defaultValue>https://interoperabilitylab.uonbi.ac.ke/test/fhir-server/api/v4/</defaultValue>
