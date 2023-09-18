@@ -53,7 +53,9 @@ public class InteropConstant {
 	
 	public static String ALLERGY_SEVERITY_SEVERE_CONCEPT_UUID = "interop.allergyReactionSevere";
 	
-	public static String DIAGNOSIS_TREATMENT_PLAN_CONCEPT_UUID = "interop.treatmentPlan";
+	public static String DIAGNOSIS_CONCEPTS = "interop.diagnosisConcepts";
+	
+	public static String DIAGNOSIS_ENCOUNTER_TYPES = "interop.encounterTypes.diagnosis";
 	
 	public static String LAB_RESULT_PROCESSOR_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.labResults";
 	
@@ -78,13 +80,13 @@ public class InteropConstant {
 	public static String DEFAULT_FACILITY = "kenyaemr.defaultLocation";
 	
 	public static String VITALS_PROCESSOR_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.vitals";
-
+	
 	public static String VITAL_CONCEPT_UUIDS = "interop.vitalsConcepts";
-
+	
 	public static String COMPLAINTS_PROCESSOR_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.complaints";
-
+	
 	public static String COMPLAINTS_CONCEPT_UUIDS = "interop.complaintsConcepts";
-
+	
 	public static final String GP_SHR_TOKEN = "interop.shr.token";
 	
 	public static final String GP_SHR_TOKEN_URL = "interop.shr.token.url";

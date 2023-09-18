@@ -137,7 +137,7 @@ public class ReferencesUtil {
 	}
 	
 	public static Reference buildPatientReference(@NotNull Patient patient) {
-		Reference reference = new Reference(ObserverUtils.getCRSystemUrlConfiguration()).setType("Patient");
+		Reference reference = new Reference("Patient/"+getPatientNUPI(patient)).setType("Patient");
 		Identifier identifier = new Identifier();
 		identifier.setSystem(ObserverUtils.getCRSystemUrlConfiguration());
 		identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
