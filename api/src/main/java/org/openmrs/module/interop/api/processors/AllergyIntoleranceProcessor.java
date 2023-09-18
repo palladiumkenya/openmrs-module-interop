@@ -122,7 +122,10 @@ public class AllergyIntoleranceProcessor implements InteropProcessor<Encounter> 
 				});
 				
 				allergy.addReaction(reactionComponent);
-				allergyIntolerances.add(allergy);
+				if (allergy != null && !allergy.getReaction().isEmpty()
+				        && !(allergy.getReactionFirstRep().getManifestation().isEmpty())) {
+					allergyIntolerances.add(allergy);
+				}
 			});
 		}
 		

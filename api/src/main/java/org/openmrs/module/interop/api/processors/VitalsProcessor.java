@@ -10,6 +10,8 @@
 package org.openmrs.module.interop.api.processors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
@@ -17,6 +19,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.fhir2.api.translators.ObservationTranslator;
 import org.openmrs.module.interop.InteropConstant;
 import org.openmrs.module.interop.api.InteropProcessor;
+import org.openmrs.module.interop.utils.ReferencesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -67,6 +70,9 @@ public class VitalsProcessor implements InteropProcessor<Encounter> {
 		if (!vitalObs.isEmpty()) {
 			for (Obs obs : vitalObs) {
 				Observation observation = observationTranslator.toFhirResource(obs);
+				observation.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+				observation.addCategory(new CodeableConcept().addCoding(
+				    new Coding("http://terminology.hl7.org/CodeSystem/observation-category", "vital-signs", "Vital Signs")));
 				vitals.add(observation);
 			}
 		}
