@@ -34,6 +34,7 @@ import org.openmrs.module.interop.api.processors.AppointmentProcessor;
 import org.openmrs.module.interop.api.processors.ComplaintsProcessor;
 import org.openmrs.module.interop.api.processors.ConditionProcessor;
 import org.openmrs.module.interop.api.processors.DiagnosticReportProcessor;
+import org.openmrs.module.interop.api.processors.LabResultsProcessor;
 import org.openmrs.module.interop.api.processors.VitalsProcessor;
 import org.openmrs.module.interop.api.processors.translators.AppointmentRequestTranslator;
 import org.openmrs.module.interop.utils.ObserverUtils;
@@ -87,6 +88,9 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	@Autowired
 	private ComplaintsProcessor complaintsProcessor;
 	
+	@Autowired
+	private LabResultsProcessor labResultsProcessor;
+	
 	@Override
 	public Class<?> clazz() {
 		return Encounter.class;
@@ -134,17 +138,17 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		preparedBundle.addEntry(encounterBundleEntryComponent);
 		
 		/* Todo: Specify which observations to include */
-		//Observations
-		List<Obs> encounterObservations = new ArrayList<>(encounter.getObs());
+		//Observations - Only enable this when you want to send all form obs as Fhir observations
+		/**List<Obs> encounterObservations = new ArrayList<>(encounter.getObs());
 		for (Obs obs : encounterObservations) {
 			Observation fhirObs = observationTranslator.toFhirResource(obs);
 			fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
-   
+
 			// provence references
 			List<Resource> resources = ReferencesUtil.resolveProvenceReference(fhirObs.getContained(), encounter);
 			fhirObs.getContained().clear();
 			//fhirObs.setContained(resources);
-   
+
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
 			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
@@ -152,8 +156,8 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			obsBundleEntry.setRequest(requestComponent);
 			obsBundleEntry.setResource(fhirObs);
 			preparedBundle.addEntry(obsBundleEntry);
-		}
-
+		}**/
+		
 		//Vital obs
 		List<Observation> vitalsObs = vitalsProcessor.process(encounter);
 		for (Observation obs : vitalsObs) {
@@ -165,10 +169,22 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			obsBundleEntry.setResource(obs);
 			preparedBundle.addEntry(obsBundleEntry);
 		}
-
+		
 		//Complaints obs
-		List<Observation> complaintsObs = vitalsProcessor.process(encounter);
+		List<Observation> complaintsObs = complaintsProcessor.process(encounter);
 		for (Observation obs : complaintsObs) {
+			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
+			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
+			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
+			requestComponent.setUrl("Observation/" + obs.getId());
+			obsBundleEntry.setRequest(requestComponent);
+			obsBundleEntry.setResource(obs);
+			preparedBundle.addEntry(obsBundleEntry);
+		}
+		
+		//Lab results obs
+		List<Observation> labResultsObs = labResultsProcessor.process(encounter);
+		for (Observation obs : labResultsObs) {
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
 			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
