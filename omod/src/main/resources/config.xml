@@ -214,8 +214,13 @@
 		<defaultValue>https://interoperabilitylab.uonbi.ac.ke/test/fhir-server/api/v4/</defaultValue>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.treatmentPlan</property>
-		<description>coma separated list of treatment plan(concept questions)</description>
+		<property>@MODULE_ID@.diagnosisConcepts</property>
+		<description>coma separated list of diagnosis concepts</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.encounterTypes.diagnosis</property>
+		<description>coma separated list of diagnosis encounter types</description>
 		<defaultValue></defaultValue>
 	</globalProperty>
 	<globalProperty>

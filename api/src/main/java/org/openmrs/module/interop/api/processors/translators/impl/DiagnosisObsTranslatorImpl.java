@@ -27,8 +27,8 @@ import java.util.Date;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-@Component("interop.conditions")
-public class ConditionObsTranslatorImpl implements ConditionObsTranslator {
+@Component("interop.diagnosis")
+public class DiagnosisObsTranslatorImpl implements ConditionObsTranslator {
 	
 	@Autowired
 	private PatientReferenceTranslator patientReferenceTranslator;
@@ -53,7 +53,8 @@ public class ConditionObsTranslatorImpl implements ConditionObsTranslator {
 		
 		fhirCondition.setVerificationStatus(new CodeableConcept()
 		        .addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-ver-status", "provisional", "PROVISIONAL")));
-		Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category ", "conditions", "Conditions");
+		Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category ", "encounter-diagnosis",
+		        "Encounter Diagnosis");
 		fhirCondition.setCategory(Collections.singletonList(new CodeableConcept().addCoding(category)));
 		fhirCondition.setRecordedDate(obs.getDateCreated());
 		fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(obs));

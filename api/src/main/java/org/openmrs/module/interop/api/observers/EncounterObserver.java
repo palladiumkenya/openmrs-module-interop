@@ -33,6 +33,7 @@ import org.openmrs.module.interop.api.processors.AllergyIntoleranceProcessor;
 import org.openmrs.module.interop.api.processors.AppointmentProcessor;
 import org.openmrs.module.interop.api.processors.ComplaintsProcessor;
 import org.openmrs.module.interop.api.processors.ConditionProcessor;
+import org.openmrs.module.interop.api.processors.DiagnosisProcessor;
 import org.openmrs.module.interop.api.processors.DiagnosticReportProcessor;
 import org.openmrs.module.interop.api.processors.LabResultsProcessor;
 import org.openmrs.module.interop.api.processors.VitalsProcessor;
@@ -69,6 +70,9 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	private ConditionProcessor conditionProcessor;
 	
 	@Autowired
+	private DiagnosisProcessor diagnosisProcessor;
+	
+	@Autowired
 	@Qualifier("interop.appointmentProcessor")
 	private AppointmentProcessor appointmentProcessor;
 	
@@ -81,10 +85,10 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	
 	@Autowired
 	private AllergyIntoleranceProcessor allergyIntoleranceProcessor;
-
+	
 	@Autowired
 	private VitalsProcessor vitalsProcessor;
-
+	
 	@Autowired
 	private ComplaintsProcessor complaintsProcessor;
 	
@@ -139,24 +143,19 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		
 		/* Todo: Specify which observations to include */
 		//Observations - Only enable this when you want to send all form obs as Fhir observations
-		/**List<Obs> encounterObservations = new ArrayList<>(encounter.getObs());
-		for (Obs obs : encounterObservations) {
-			Observation fhirObs = observationTranslator.toFhirResource(obs);
-			fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
-
-			// provence references
-			List<Resource> resources = ReferencesUtil.resolveProvenceReference(fhirObs.getContained(), encounter);
-			fhirObs.getContained().clear();
-			//fhirObs.setContained(resources);
-
-			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
-			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
-			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
-			requestComponent.setUrl("Observation/" + fhirObs.getId());
-			obsBundleEntry.setRequest(requestComponent);
-			obsBundleEntry.setResource(fhirObs);
-			preparedBundle.addEntry(obsBundleEntry);
-		}**/
+		/**
+		 * List<Obs> encounterObservations = new ArrayList<>(encounter.getObs()); for (Obs obs :
+		 * encounterObservations) { Observation fhirObs = observationTranslator.toFhirResource(obs);
+		 * fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient())); // provence
+		 * references List<Resource> resources =
+		 * ReferencesUtil.resolveProvenceReference(fhirObs.getContained(), encounter);
+		 * fhirObs.getContained().clear(); //fhirObs.setContained(resources); Bundle.BundleEntryComponent
+		 * obsBundleEntry = new Bundle.BundleEntryComponent(); Bundle.BundleEntryRequestComponent
+		 * requestComponent = new Bundle.BundleEntryRequestComponent();
+		 * requestComponent.setMethod(Bundle.HTTPVerb.PUT); requestComponent.setUrl("Observation/" +
+		 * fhirObs.getId()); obsBundleEntry.setRequest(requestComponent);
+		 * obsBundleEntry.setResource(fhirObs); preparedBundle.addEntry(obsBundleEntry); }
+		 **/
 		
 		//Vital obs
 		List<Observation> vitalsObs = vitalsProcessor.process(encounter);
@@ -255,12 +254,15 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			condition.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			condition.getRecorder().setIdentifier(buildProviderIdentifier(encounter));
 			condition.setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
-			
-			List<Resource> resources = ReferencesUtil.resolveProvenceReference(condition.getContained(), encounter);
-			condition.getContained().clear();
-			//condition.setContained(resources);
-			
 			bundle.addEntry(buildConditionBundleEntry(condition));
+		});
+		
+		List<Condition> diagnosis = diagnosisProcessor.process(encounter);
+		diagnosis.forEach(d -> {
+			d.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+			d.getRecorder().setIdentifier(buildProviderIdentifier(encounter));
+			d.setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
+			bundle.addEntry(buildConditionBundleEntry(d));
 		});
 		
 		List<Appointment> appointments = appointmentProcessor.process(encounter);
