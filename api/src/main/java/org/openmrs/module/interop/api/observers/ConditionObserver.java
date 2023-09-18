@@ -3,7 +3,7 @@
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
  * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
  * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- * <p>
+ *
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
@@ -28,33 +28,33 @@ import java.util.List;
 @Slf4j
 @Component("interop.conditionCreationObserver")
 public class ConditionObserver extends BaseObserver implements Subscribable<Condition> {
-
-    @Autowired
-    private InteropConditionTranslator<Condition> conditionTranslator;
-
-    @Override
-    public Class<?> clazz() {
-        return Condition.class;
-    }
-
-    @Override
-    public List<Event.Action> actions() {
-        return ObserverUtils.defaultActions();
-    }
-
-    @Override
-    public void onMessage(Message message) {
-        processMessage(message)
-                .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareConditionsMessage(metadata), getDaemonToken()));
-    }
-
-    private void prepareConditionsMessage(@NotNull EventMetadata metadata) {
-        Condition condition = Context.getConditionService().getConditionByUuid(metadata.getString("uuid"));
-        org.hl7.fhir.r4.model.Condition fhirCondition = conditionTranslator.toFhirResource(condition);
-        if (fhirCondition != null) {
-            this.publish(fhirCondition);
-        } else {
-            log.error("Couldn't find condition with UUID {} ", metadata.getString("uuid"));
-        }
-    }
+	
+	@Autowired
+	private InteropConditionTranslator<Condition> conditionTranslator;
+	
+	@Override
+	public Class<?> clazz() {
+		return Condition.class;
+	}
+	
+	@Override
+	public List<Event.Action> actions() {
+		return ObserverUtils.defaultActions();
+	}
+	
+	@Override
+	public void onMessage(Message message) {
+		processMessage(message)
+		        .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareConditionsMessage(metadata), getDaemonToken()));
+	}
+	
+	private void prepareConditionsMessage(@NotNull EventMetadata metadata) {
+		Condition condition = Context.getConditionService().getConditionByUuid(metadata.getString("uuid"));
+		org.hl7.fhir.r4.model.Condition fhirCondition = conditionTranslator.toFhirResource(condition);
+		if (fhirCondition != null) {
+			this.publish(fhirCondition);
+		} else {
+			log.error("Couldn't find condition with UUID {} ", metadata.getString("uuid"));
+		}
+	}
 }

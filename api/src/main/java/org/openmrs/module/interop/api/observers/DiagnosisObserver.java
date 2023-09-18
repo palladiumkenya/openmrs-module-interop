@@ -29,34 +29,35 @@ import java.util.List;
 @Slf4j
 @Component("interop.diagnosisCreationObserver")
 public class DiagnosisObserver extends BaseObserver implements Subscribable<Diagnosis> {
-
-    @Autowired
-    private InteropConditionTranslator<Diagnosis> diagnosisTranslator;
-
-    @Override
-    public Class<?> clazz() {
-        return Diagnosis.class;
-    }
-
-    @Override
-    public List<Event.Action> actions() {
-        return ObserverUtils.defaultActions();
-    }
-
-    @Override
-    public void onMessage(Message message) {
-        processMessage(message)
-                .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareDiagnosisMessage(metadata), getDaemonToken()));
-    }
-
-    private void prepareDiagnosisMessage(@NotNull EventMetadata metadata) {
-        Diagnosis diagnosis = Context.getDiagnosisService().getDiagnosisByUuid(metadata.getString("uuid"));
-        if (diagnosis.getCertainty() == null || diagnosis.getCertainty().equals(ConditionVerificationStatus.PROVISIONAL)) return;
-        org.hl7.fhir.r4.model.Condition fhirCondition = diagnosisTranslator.toFhirResource(diagnosis);
-        if (fhirCondition != null) {
-            this.publish(fhirCondition);
-        } else {
-            log.error("Couldn't find diagnosis with UUID {} ", metadata.getString("uuid"));
-        }
-    }
+	
+	@Autowired
+	private InteropConditionTranslator<Diagnosis> diagnosisTranslator;
+	
+	@Override
+	public Class<?> clazz() {
+		return Diagnosis.class;
+	}
+	
+	@Override
+	public List<Event.Action> actions() {
+		return ObserverUtils.defaultActions();
+	}
+	
+	@Override
+	public void onMessage(Message message) {
+		processMessage(message)
+		        .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareDiagnosisMessage(metadata), getDaemonToken()));
+	}
+	
+	private void prepareDiagnosisMessage(@NotNull EventMetadata metadata) {
+		Diagnosis diagnosis = Context.getDiagnosisService().getDiagnosisByUuid(metadata.getString("uuid"));
+		if (diagnosis.getCertainty() == null || diagnosis.getCertainty().equals(ConditionVerificationStatus.PROVISIONAL))
+			return;
+		org.hl7.fhir.r4.model.Condition fhirCondition = diagnosisTranslator.toFhirResource(diagnosis);
+		if (fhirCondition != null) {
+			this.publish(fhirCondition);
+		} else {
+			log.error("Couldn't find diagnosis with UUID {} ", metadata.getString("uuid"));
+		}
+	}
 }
