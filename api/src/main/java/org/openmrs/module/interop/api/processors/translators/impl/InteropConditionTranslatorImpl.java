@@ -3,7 +3,7 @@
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
  * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
  * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- * <p>
+ *
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
@@ -28,49 +28,49 @@ import java.util.Date;
 
 @Component("interop.interopConditionTranslator")
 public class InteropConditionTranslatorImpl implements InteropConditionTranslator<Condition> {
-
-    @Autowired
-    private PatientReferenceTranslator patientReferenceTranslator;
-
-    @Autowired
-    private ConceptTranslator conceptTranslator;
-
-    @Override
-    public org.hl7.fhir.r4.model.Condition toFhirResource(@Nonnull Condition condition) {
-        org.hl7.fhir.r4.model.Condition fhirCondition = new org.hl7.fhir.r4.model.Condition();
-        fhirCondition.setId(condition.getUuid());
-        Patient patient = condition.getPatient();
-        fhirCondition.setSubject(patientReferenceTranslator.toFhirResource(patient));
-        if (condition.getCondition() != null && condition.getCondition().getCoded() != null) {
-            fhirCondition.setCode(conceptTranslator.toFhirResource(condition.getCondition().getCoded()));
-        }
-        if (condition.getClinicalStatus() != null) {
-            fhirCondition.setClinicalStatus(
-                    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-clinical",
-                            condition.getClinicalStatus().toString().toLowerCase(), condition.getClinicalStatus().toString())));
-        }
-        if (condition.getVerificationStatus() != null) {
-            fhirCondition.setVerificationStatus(
-                    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-ver-status",
-                            condition.getVerificationStatus().toString().toLowerCase(),
-                            condition.getVerificationStatus().toString())));
-        }
-        Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category ", "conditions", "Conditions");
-        fhirCondition.setCategory(Collections.singletonList(new CodeableConcept().addCoding(category)));
-        fhirCondition.setOnset(new DateTimeType().setValue(condition.getOnsetDate()));
-        fhirCondition.setRecordedDate(condition.getDateCreated());
-        fhirCondition.setAbatement(new DateTimeType().setValue(condition.getEndDate()));
-        fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(condition));
-
-        return fhirCondition;
-    }
-
-    public Date getLastUpdated(OpenmrsObject object) {
-        if (object instanceof Auditable) {
-            Auditable auditable = (Auditable) object;
-            return auditable.getDateChanged() != null ? auditable.getDateChanged() : auditable.getDateCreated();
-        } else {
-            return null;
-        }
-    }
+	
+	@Autowired
+	private PatientReferenceTranslator patientReferenceTranslator;
+	
+	@Autowired
+	private ConceptTranslator conceptTranslator;
+	
+	@Override
+	public org.hl7.fhir.r4.model.Condition toFhirResource(@Nonnull Condition condition) {
+		org.hl7.fhir.r4.model.Condition fhirCondition = new org.hl7.fhir.r4.model.Condition();
+		fhirCondition.setId(condition.getUuid());
+		Patient patient = condition.getPatient();
+		fhirCondition.setSubject(patientReferenceTranslator.toFhirResource(patient));
+		if (condition.getCondition() != null && condition.getCondition().getCoded() != null) {
+			fhirCondition.setCode(conceptTranslator.toFhirResource(condition.getCondition().getCoded()));
+		}
+		if (condition.getClinicalStatus() != null) {
+			fhirCondition.setClinicalStatus(
+			    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-clinical",
+			            condition.getClinicalStatus().toString().toLowerCase(), condition.getClinicalStatus().toString())));
+		}
+		if (condition.getVerificationStatus() != null) {
+			fhirCondition.setVerificationStatus(
+			    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-ver-status",
+			            condition.getVerificationStatus().toString().toLowerCase(),
+			            condition.getVerificationStatus().toString())));
+		}
+		Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category ", "conditions", "Conditions");
+		fhirCondition.setCategory(Collections.singletonList(new CodeableConcept().addCoding(category)));
+		fhirCondition.setOnset(new DateTimeType().setValue(condition.getOnsetDate()));
+		fhirCondition.setRecordedDate(condition.getDateCreated());
+		fhirCondition.setAbatement(new DateTimeType().setValue(condition.getEndDate()));
+		fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(condition));
+		
+		return fhirCondition;
+	}
+	
+	public Date getLastUpdated(OpenmrsObject object) {
+		if (object instanceof Auditable) {
+			Auditable auditable = (Auditable) object;
+			return auditable.getDateChanged() != null ? auditable.getDateChanged() : auditable.getDateCreated();
+		} else {
+			return null;
+		}
+	}
 }
