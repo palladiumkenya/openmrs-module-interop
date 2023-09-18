@@ -46,12 +46,12 @@ public class InteropConditionTranslatorImpl implements InteropConditionTranslato
 		}
 		if (condition.getClinicalStatus() != null) {
 			fhirCondition.setClinicalStatus(
-			    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-clinical",
+			    new CodeableConcept().addCoding(new Coding("http://terminology.hl7.org/CodeSystem/condition-clinical",
 			            condition.getClinicalStatus().toString().toLowerCase(), condition.getClinicalStatus().toString())));
 		}
 		if (condition.getVerificationStatus() != null) {
 			fhirCondition.setVerificationStatus(
-			    new CodeableConcept().addCoding(new Coding("http://hl7.org/fhir/ValueSet/condition-ver-status",
+			    new CodeableConcept().addCoding(new Coding("http://terminology.hl7.org/CodeSystem/condition-ver-status",
 			            condition.getVerificationStatus().toString().toLowerCase(),
 			            condition.getVerificationStatus().toString())));
 		}
