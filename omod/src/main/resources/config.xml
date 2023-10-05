@@ -213,6 +213,11 @@
 		<description>Coma separated list of cancer referral reason(concept questions)</description>
 		<defaultValue></defaultValue>
 	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.cancerTxReferralFacility</property>
+		<description>Cancer treatment referral facility</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
 
 
 	<globalProperty>
