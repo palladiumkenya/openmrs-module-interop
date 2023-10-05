@@ -57,7 +57,7 @@ public class ReferencesUtil {
 			if (!mflCodeAttribute.isEmpty()) {
 				locationRef.setIdentifier(new Identifier().setSystem(ObserverUtils.getKhmflSystemUrlConfiguration())
 				        .setValue(mflCodeAttribute.get(0).getValue().toString()).setUse(Identifier.IdentifierUse.OFFICIAL));
-				
+				locationRef.setDisplay(mflCodeAttribute.get(0).getValue().toString());
 			}
 		}
 		return locationRef;
