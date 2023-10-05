@@ -9,25 +9,19 @@
  */
 package org.openmrs.module.interop.api.processors.translators.impl;
 
-import org.hl7.fhir.r4.model.*;
-import org.hl7.fhir.r4.model.Condition;
-import org.openmrs.*;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openmrs.Encounter;
-import org.openmrs.Patient;
-import org.openmrs.Person;
+import org.openmrs.EncounterProvider;
 import org.openmrs.module.fhir2.FhirConstants;
-import org.openmrs.module.fhir2.api.translators.ConceptTranslator;
 import org.openmrs.module.fhir2.api.translators.EncounterReferenceTranslator;
 import org.openmrs.module.fhir2.api.translators.PatientReferenceTranslator;
 import org.openmrs.module.interop.api.processors.translators.ServiceRequestObsTranslator;
-import org.openmrs.module.interop.utils.ObserverUtils;
 import org.openmrs.module.interop.utils.ReferencesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Date;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -53,8 +47,6 @@ public class ServiceRequestObsTranslatorImpl implements ServiceRequestObsTransla
         serviceRequest.setIntent(ServiceRequest.ServiceRequestIntent.ORDER);
 
         serviceRequest.setSubject(patientReferenceTranslator.toFhirResource(encounter.getPatient()));
-
-        serviceRequest.setRequester(getProviderReference(encounter));
 
         return serviceRequest;
     }
