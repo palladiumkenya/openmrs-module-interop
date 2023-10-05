@@ -27,6 +27,7 @@ import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
 import org.openmrs.event.Event;
+import org.openmrs.module.fhir2.api.translators.ConceptTranslator;
 import org.openmrs.module.fhir2.api.translators.EncounterReferenceTranslator;
 import org.openmrs.module.fhir2.api.translators.EncounterTranslator;
 import org.openmrs.module.fhir2.api.translators.ObservationTranslator;
@@ -88,6 +89,9 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	
 	@Autowired
 	private ServiceRequestProcessor serviceRequestProcessor;
+	
+	@Autowired
+	private ConceptTranslator conceptTranslator;
 	
 	@Override
 	public Class<?> clazz() {
@@ -180,6 +184,8 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 				Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
 				requestComponent.setMethod(Bundle.HTTPVerb.PUT);
 				Observation observation = observationTranslator.toFhirResource(r);
+				observation.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+				
 				obsRefs.add(new Reference(r.getUuid()).setType("Observation"));
 				
 				if (r.getObsGroup() != null) {
@@ -195,19 +201,22 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 					                    && txPlan.contains(f.getConcept().getUuid()))
 					        .collect(Collectors.toList());
 					
-					observation.setCode(new CodeableConcept()
-					        .addCoding(new Coding("TEST SYSTEM ", r.getValueCoded().getDisplayString(), "")));
+					observation.setCode(
+					    new CodeableConcept().addCoding(new Coding("https://openconceptlab.org/orgs/CIEL/sources/CIEL",
+					            r.getValueCoded().getUuid().replace("A", ""), r.getValueCoded().getDisplayString())));
 					
 					CodeableConcept findingsCode = new CodeableConcept();
 					List<String> txPlanCode = new ArrayList<>();
 					if (!findingsObs.isEmpty()) {
 						findingsObs.forEach(e -> {
-							findingsCode.addCoding(new Coding("TEST SYSTEM", e.getValueCoded().getDisplayString(), ""));
+							findingsCode.addCoding(new Coding("https://openconceptlab.org/orgs/CIEL/sources/CIEL",
+							        e.getValueCoded().getUuid().replace("A", ""), "")
+							                .setDisplay(e.getValueCoded().getDisplayString()));
 						});
 					}
 					if (!txPlanObs.isEmpty()) {
 						txPlanObs.forEach(e -> {
-							txPlanCode.add(e.getValueCoded().getUuid());
+							txPlanCode.add(e.getValueCoded().getDisplayString());
 						});
 					}
 					observation.setValue(findingsCode);
