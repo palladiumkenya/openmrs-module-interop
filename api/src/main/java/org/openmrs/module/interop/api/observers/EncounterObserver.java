@@ -11,8 +11,11 @@ package org.openmrs.module.interop.api.observers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
+import org.hl7.fhir.r4.model.Annotation;
 import org.hl7.fhir.r4.model.Appointment;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Condition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.Observation;
@@ -27,12 +30,14 @@ import org.openmrs.event.Event;
 import org.openmrs.module.fhir2.api.translators.EncounterReferenceTranslator;
 import org.openmrs.module.fhir2.api.translators.EncounterTranslator;
 import org.openmrs.module.fhir2.api.translators.ObservationTranslator;
+import org.openmrs.module.interop.InteropConstant;
 import org.openmrs.module.interop.api.Subscribable;
 import org.openmrs.module.interop.api.metadata.EventMetadata;
 import org.openmrs.module.interop.api.processors.AllergyIntoleranceProcessor;
 import org.openmrs.module.interop.api.processors.AppointmentProcessor;
 import org.openmrs.module.interop.api.processors.ConditionProcessor;
 import org.openmrs.module.interop.api.processors.DiagnosticReportProcessor;
+import org.openmrs.module.interop.api.processors.ServiceRequestProcessor;
 import org.openmrs.module.interop.api.processors.translators.AppointmentRequestTranslator;
 import org.openmrs.module.interop.utils.ObserverUtils;
 import org.openmrs.module.interop.utils.ReferencesUtil;
@@ -44,8 +49,10 @@ import javax.annotation.Nonnull;
 import javax.jms.Message;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.openmrs.module.interop.utils.ReferencesUtil.buildProviderIdentifier;
 
@@ -78,6 +85,9 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	
 	@Autowired
 	private AllergyIntoleranceProcessor allergyIntoleranceProcessor;
+	
+	@Autowired
+	private ServiceRequestProcessor serviceRequestProcessor;
 	
 	@Override
 	public Class<?> clazz() {
@@ -128,7 +138,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		/* Todo: Specify which observations to include */
 		//Observations
 		List<Obs> encounterObservations = new ArrayList<>(encounter.getObs());
-		for (Obs obs : encounterObservations) {
+		/*for (Obs obs : encounterObservations) {
 			Observation fhirObs = observationTranslator.toFhirResource(obs);
 			fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			
@@ -144,10 +154,79 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			obsBundleEntry.setRequest(requestComponent);
 			obsBundleEntry.setResource(fhirObs);
 			preparedBundle.addEntry(obsBundleEntry);
-		}
+		}*/
 		
 		this.processFhirResources(encounter, preparedBundle);
 		this.publish(preparedBundle);
+	}
+	
+	private List<Bundle.BundleEntryComponent> buildCancerScreeningReferralInfo(Encounter encounter) {
+		List<Obs> cancerScreeningObs = new ArrayList<>();
+		encounter.getObs().forEach(ob -> {
+			if (validateConceptScreeningObs(ob)) {
+				cancerScreeningObs.add(ob);
+			}
+		});
+		
+		if (!cancerScreeningObs.isEmpty()) {
+			List<Bundle.BundleEntryComponent> bundleEntryComponentList = new ArrayList<>();
+			List<String> findings = Arrays.asList(Context.getAdministrationService()
+			        .getGlobalPropertyValue(InteropConstant.CANCER_SCREENING_FINDINGS_CONCEPT_UUID, "").split(","));
+			List<String> txPlan = Arrays.asList(Context.getAdministrationService()
+			        .getGlobalPropertyValue(InteropConstant.CANCER_SCREENING_ACTION_CONCEPT_UUID, "").split(","));
+			List<Reference> obsRefs = new ArrayList<>();
+			cancerScreeningObs.forEach(r -> {
+				Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
+				Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
+				requestComponent.setMethod(Bundle.HTTPVerb.PUT);
+				Observation observation = observationTranslator.toFhirResource(r);
+				obsRefs.add(new Reference(r.getUuid()).setType("Observation"));
+				
+				if (r.getObsGroup() != null) {
+					
+					List<Obs> findingsObs = encounter.getObs().stream()
+					        .filter(
+					            f -> f.getObsGroup() != null && r.getObsGroup().getUuid().equals(f.getObsGroup().getUuid())
+					                    && findings.contains(f.getConcept().getUuid()))
+					        .collect(Collectors.toList());
+					List<Obs> txPlanObs = encounter.getObs().stream()
+					        .filter(
+					            f -> f.getObsGroup() != null && r.getObsGroup().getUuid().equals(f.getObsGroup().getUuid())
+					                    && txPlan.contains(f.getConcept().getUuid()))
+					        .collect(Collectors.toList());
+					
+					observation.setCode(new CodeableConcept()
+					        .addCoding(new Coding("TEST SYSTEM ", r.getValueCoded().getDisplayString(), "")));
+					
+					CodeableConcept findingsCode = new CodeableConcept();
+					List<String> txPlanCode = new ArrayList<>();
+					if (!findingsObs.isEmpty()) {
+						findingsObs.forEach(e -> {
+							findingsCode.addCoding(new Coding("TEST SYSTEM", e.getValueCoded().getDisplayString(), ""));
+						});
+					}
+					if (!txPlanObs.isEmpty()) {
+						txPlanObs.forEach(e -> {
+							txPlanCode.add(e.getValueCoded().getUuid());
+						});
+					}
+					observation.setValue(findingsCode);
+					observation.addNote(new Annotation().setText(String.join(",", txPlanCode)));
+				}
+				requestComponent.setUrl("Observation/" + observation.getId());
+				obsBundleEntry.setRequest(requestComponent);
+				obsBundleEntry.setResource(observation);
+				bundleEntryComponentList.add(obsBundleEntry);
+			});
+			return bundleEntryComponentList;
+		}
+		return new ArrayList<>();
+	}
+	
+	private boolean validateConceptScreeningObs(Obs conceptObs) {
+		List<String> concepts = Arrays.asList(Context.getAdministrationService()
+		        .getGlobalPropertyValue(InteropConstant.CANCER_SCREENING_CONCEPT_UUID, "").split(","));
+		return concepts.contains(conceptObs.getConcept().getUuid());
 	}
 	
 	private Bundle.BundleEntryComponent buildConditionBundleEntry(Condition condition) {
@@ -251,5 +330,17 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			bundle.addEntry(createAllergyComponent(allergy));
 		});
 		
+		if (!buildCancerScreeningReferralInfo(encounter).isEmpty()) {
+			for (Bundle.BundleEntryComponent component : buildCancerScreeningReferralInfo(encounter)) {
+				bundle.addEntry(component);
+			}
+		}
+		
+		List<ServiceRequest> serviceRequests = serviceRequestProcessor.process(encounter);
+		if (!serviceRequests.isEmpty()) {
+			serviceRequests.get(0).setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+			serviceRequests.get(0).setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
+			bundle.addEntry(createAppointmentRequestBundleComponent(serviceRequests.get(0)));
+		}
 	}
 }

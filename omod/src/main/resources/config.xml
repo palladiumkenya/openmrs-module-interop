@@ -189,6 +189,40 @@
 		<defaultValue></defaultValue>
 	</globalProperty>
 	<globalProperty>
+		<property>@MODULE_ID@.cancerReferralSymptoms</property>
+		<description>Coma separated list of cancer screening symptoms(concept questions)</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.cancerScreeningConcepts</property>
+		<description>Coma separated list of cancer screening concepts(concept questions)</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.cancerScreeningFindingsConcepts</property>
+		<description>Coma separated list of cancer screening findings concepts(concept questions)</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.cancerScreeningTreatmentActionConcepts</property>
+		<description>Coma separated list of cancer screening treatment action concepts(concept questions)</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.cancerReferralReason</property>
+		<description>Coma separated list of cancer referral reason(concept questions)</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>@MODULE_ID@.encounterTypes.cancerReferral</property>
+		<description>Cancer Screening encounter types enabled</description>
+		<defaultValue></defaultValue>
+	</globalProperty>
+
+
+	<globalProperty>
 		<property>@MODULE_ID@.system.url.configuration</property>
 		<description>System Configuration URL</description>
 		<defaultValue>https://interoperabilitylab.uonbi.ac.ke/test/fhir-server/api/v4/</defaultValue>
