@@ -137,7 +137,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		bundleEntryRequestComponent.setUrl("Encounter/" + fhirEncounter.getId());
 		encounterBundleEntryComponent.setRequest(bundleEntryRequestComponent);
 		encounterBundleEntryComponent.setResource(fhirEncounter);
-		preparedBundle.addEntry(encounterBundleEntryComponent);
+		//		preparedBundle.addEntry(encounterBundleEntryComponent);
 		
 		/* Todo: Specify which observations to include */
 		//Observations
@@ -258,7 +258,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		return bundleEntryComponent;
 	}
 	
-	private Bundle.BundleEntryComponent createAppointmentRequestBundleComponent(ServiceRequest serviceRequest) {
+	private Bundle.BundleEntryComponent createServiceRequestBundleComponent(ServiceRequest serviceRequest) {
 		Bundle.BundleEntryRequestComponent bundleEntryRequestComponent = new Bundle.BundleEntryRequestComponent();
 		bundleEntryRequestComponent.setMethod(Bundle.HTTPVerb.PUT);
 		bundleEntryRequestComponent.setUrl("ServiceRequest/" + serviceRequest.getId());
@@ -290,7 +290,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	
 	private void processFhirResources(@Nonnull Encounter encounter, @NotNull Bundle bundle) {
 		
-		List<Condition> conditions = conditionProcessor.process(encounter);
+		/*List<Condition> conditions = conditionProcessor.process(encounter);
 		conditions.forEach(condition -> {
 			condition.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			condition.getRecorder().setIdentifier(buildProviderIdentifier(encounter));
@@ -309,7 +309,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			serviceRequest.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			Reference locationRef = ReferencesUtil.buildKhmflOrganizationReference(encounter.getLocation());
 			serviceRequest.setRequester(locationRef);
-			bundle.addEntry(createAppointmentRequestBundleComponent(serviceRequest));
+			bundle.addEntry(createServiceRequestBundleComponent(serviceRequest));
 			
 			appointments.forEach(appointment -> {
 				List<Resource> resources = ReferencesUtil.resolveProvenceReference(appointment.getContained(), encounter);
@@ -337,19 +337,20 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			allergy.setPatient(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			allergy.setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
 			bundle.addEntry(createAllergyComponent(allergy));
-		});
-		
-		if (!buildCancerScreeningReferralInfo(encounter).isEmpty()) {
-			for (Bundle.BundleEntryComponent component : buildCancerScreeningReferralInfo(encounter)) {
-				bundle.addEntry(component);
-			}
-		}
+		});*/
 		
 		List<ServiceRequest> serviceRequests = serviceRequestProcessor.process(encounter);
 		if (!serviceRequests.isEmpty()) {
 			serviceRequests.get(0).setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			serviceRequests.get(0).setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
-			bundle.addEntry(createAppointmentRequestBundleComponent(serviceRequests.get(0)));
+			bundle.addEntry(createServiceRequestBundleComponent(serviceRequests.get(0)));
 		}
+		
+		//		if (!buildCancerScreeningReferralInfo(encounter).isEmpty()) {
+		//			for (Bundle.BundleEntryComponent component : buildCancerScreeningReferralInfo(encounter)) {
+		//				bundle.addEntry(component);
+		//			}
+		//		}
+		
 	}
 }
