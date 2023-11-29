@@ -63,6 +63,8 @@ public class InteropConstant {
 	
 	public static String CANCER_SCREENING_SYMPTOMS_CONCEPT_UUID = "interop.cancerReferralSymptoms";
 	
+	public static String REFERRAL_NOTE_CONCEPT_UUID = "interop.referralNoteConcept";
+	
 	public static String CANCER_SCREENING_CONCEPT_UUID = "interop.cancerScreeningConcepts";
 	
 	public static String CANCER_SCREENING_FINDINGS_CONCEPT_UUID = "interop.cancerScreeningFindingsConcepts";
