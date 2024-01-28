@@ -49,7 +49,7 @@ public class ReferencesUtil {
 	}
 	
 	public static Reference buildKhmflLocationReference(@NotNull Location location) {
-		Reference locationRef = new Reference(ObserverUtils.getKhmflSystemUrlConfiguration()).setType("Location");
+		Reference locationRef = new Reference(ObserverUtils.getKhmflSystemUrlConfiguration()).setType("Organization");
 		if (ObserverUtils.getMFLCODELocationAttributeType() != null) {
 			String mflCodeUuid = ObserverUtils.getMFLCODELocationAttributeType().getUuid();
 			List<LocationAttribute> mflCodeAttribute = location.getActiveAttributes().stream()
@@ -57,7 +57,7 @@ public class ReferencesUtil {
 			if (!mflCodeAttribute.isEmpty()) {
 				locationRef.setIdentifier(new Identifier().setSystem(ObserverUtils.getKhmflSystemUrlConfiguration())
 				        .setValue(mflCodeAttribute.get(0).getValue().toString()).setUse(Identifier.IdentifierUse.OFFICIAL));
-				
+				locationRef.setDisplay(mflCodeAttribute.get(0).getValue().toString());
 			}
 		}
 		return locationRef;

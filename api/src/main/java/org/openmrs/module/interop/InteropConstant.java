@@ -59,6 +59,24 @@ public class InteropConstant {
 	
 	public static String LAB_RESULT_CONCEPT_UUID = "interop.labResults";
 	
+	public static String CANCER_SCREENING_ENCOUNTER_TYPE_UUIDS = "interop.encounterTypes.cancerReferral";
+	
+	public static String CANCER_SCREENING_SYMPTOMS_CONCEPT_UUID = "interop.cancerReferralSymptoms";
+	
+	public static String REFERRAL_NOTE_CONCEPT_UUID = "interop.referralNoteConcept";
+	
+	public static String CANCER_SCREENING_CONCEPT_UUID = "interop.cancerScreeningConcepts";
+	
+	public static String CANCER_SCREENING_FINDINGS_CONCEPT_UUID = "interop.cancerScreeningFindingsConcepts";
+	
+	public static String CANCER_SCREENING_ACTION_CONCEPT_UUID = "interop.cancerScreeningTreatmentActionConcepts";
+	
+	public static String CANCER_SCREENING_REFERRAL_REASON_CONCEPT_UUID = "interop.cancerReferralReason";
+	
+	public static String CANCER_TREATMENT_REFERRAL_FACILITY = "interop.cancerTxReferralFacility";
+	
+	public static String DEFAULT_FACILITY = "kenyaemr.defaultLocation";
+	
 	public static final String GP_SHR_TOKEN = "interop.shr.token";
 	
 	public static final String GP_SHR_TOKEN_URL = "interop.shr.token.url";
