@@ -27,27 +27,27 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@Component("interop.conditionBroker")
-public class ConditionProcessor implements InteropProcessor<Encounter> {
+@Component("interop.diagnosisProcessor")
+public class DiagnosisProcessor implements InteropProcessor<Encounter> {
 	
 	@Autowired
 	private ConceptTranslator conceptTranslator;
 	
 	@Autowired
-	@Qualifier("interop.conditions")
-	private ConditionObsTranslator conditionObsTranslator;
+	@Qualifier("interop.diagnosis")
+	private ConditionObsTranslator diagnosisObsTranslator;
 	
 	@Override
 	public List<String> encounterTypes() {
 		
 		return Arrays.asList(Context.getAdministrationService()
-		        .getGlobalPropertyValue(InteropConstant.CONDITION_BROKER_ENCOUNTER_TYPE_UUIDS, "").split(","));
+		        .getGlobalPropertyValue(InteropConstant.DIAGNOSIS_ENCOUNTER_TYPES, "").split(","));
 	}
 	
 	@Override
 	public List<String> questions() {
 		String conditionString = Context.getAdministrationService()
-		        .getGlobalPropertyValue(InteropConstant.CONDITIONS_CONCEPT_UUID, "");
+		        .getGlobalPropertyValue(InteropConstant.DIAGNOSIS_CONCEPTS, "");
 		
 		return Arrays.asList(conditionString.split(","));
 	}
@@ -73,7 +73,7 @@ public class ConditionProcessor implements InteropProcessor<Encounter> {
 		List<Condition> conditions = new ArrayList<>();
 		if (!conditionsObs.isEmpty()) {
 			conditionsObs.forEach(obs -> {
-				Condition condition = conditionObsTranslator.toFhirResource(obs);
+				Condition condition = diagnosisObsTranslator.toFhirResource(obs);
 				conditions.add(condition);
 			});
 		}

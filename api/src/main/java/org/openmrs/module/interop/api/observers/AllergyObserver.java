@@ -50,10 +50,12 @@ public class AllergyObserver extends BaseObserver implements Subscribable<Allerg
 	private void prepareAllergyMessage(@NotNull EventMetadata metadata) {
 		org.hl7.fhir.r4.model.AllergyIntolerance allergyIntolerance = allergyIntoleranceService
 		        .get(metadata.getString("uuid"));
-		if (allergyIntolerance != null) {
+		if (allergyIntolerance != null && !allergyIntolerance.getReaction().isEmpty()
+		        && !(allergyIntolerance.getReactionFirstRep().getManifestation().isEmpty())) {
 			this.publish(allergyIntolerance);
 		} else {
-			log.error("Couldn't find allergy with UUID {} ", metadata.getString("uuid"));
+			log.error("Couldn't find allergy with UUID {} or resource missing required properties",
+			    metadata.getString("uuid"));
 		}
 	}
 }

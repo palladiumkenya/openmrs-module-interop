@@ -11,14 +11,13 @@ package org.openmrs.module.interop.api.processors.translators.impl;
 
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.DateTimeType;
+import org.hl7.fhir.r4.model.Condition;
 import org.openmrs.Auditable;
-import org.openmrs.Diagnosis;
+import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.Patient;
 import org.openmrs.module.fhir2.api.translators.ConceptTranslator;
 import org.openmrs.module.fhir2.api.translators.PatientReferenceTranslator;
-import org.openmrs.module.interop.api.processors.translators.InteropConditionTranslator;
+import org.openmrs.module.interop.api.processors.translators.ConditionObsTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +25,10 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Date;
 
-@Component("interop.interopDiagnosisTranslator")
-public class InteropDiagnosisTranslatorImp implements InteropConditionTranslator<Diagnosis> {
+import static org.apache.commons.lang3.Validate.notNull;
+
+@Component("interop.diagnosis")
+public class DiagnosisObsTranslatorImpl implements ConditionObsTranslator {
 	
 	@Autowired
 	private PatientReferenceTranslator patientReferenceTranslator;
@@ -36,27 +37,27 @@ public class InteropDiagnosisTranslatorImp implements InteropConditionTranslator
 	private ConceptTranslator conceptTranslator;
 	
 	@Override
-	public org.hl7.fhir.r4.model.Condition toFhirResource(@Nonnull Diagnosis diagnosis) {
-		org.hl7.fhir.r4.model.Condition fhirCondition = new org.hl7.fhir.r4.model.Condition();
-		fhirCondition.setId(diagnosis.getUuid());
-		Patient patient = diagnosis.getPatient();
-		fhirCondition.setSubject(patientReferenceTranslator.toFhirResource(patient));
-		if (diagnosis.getDiagnosis() != null && diagnosis.getDiagnosis().getCoded() != null) {
-			fhirCondition.setCode(conceptTranslator.toFhirResource(diagnosis.getDiagnosis().getCoded()));
+	public Condition toFhirResource(@Nonnull Obs obs) {
+		notNull(obs, "The Openmrs Obs object should not be null");
+		
+		/** Todo - Updated this to read from repeated obs */
+		Condition fhirCondition = new Condition();
+		fhirCondition.setId(obs.getUuid());
+		
+		fhirCondition.setSubject(patientReferenceTranslator.toFhirResource(obs.getEncounter().getPatient()));
+		if (obs.getValueCoded() != null) {
+			fhirCondition.setCode(conceptTranslator.toFhirResource(obs.getValueCoded()));
 		}
 		fhirCondition.setClinicalStatus(new CodeableConcept()
 		        .addCoding(new Coding("http://terminology.hl7.org/CodeSystem/condition-clinical", "active", "ACTIVE")));
-		if (diagnosis.getCertainty() != null) {
-			fhirCondition.setVerificationStatus(
-			    new CodeableConcept().addCoding(new Coding("http://terminology.hl7.org/CodeSystem/condition-ver-status",
-			            diagnosis.getCertainty().toString().toLowerCase(), diagnosis.getCertainty().toString())));
-		}
+		
+		fhirCondition.setVerificationStatus(new CodeableConcept().addCoding(
+		    new Coding("http://terminology.hl7.org/CodeSystem/condition-ver-status", "provisional", "PROVISIONAL")));
 		Coding category = new Coding("http://hl7.org/fhir/ValueSet/condition-category", "encounter-diagnosis",
 		        "Encounter Diagnosis");
-		fhirCondition.setCategory(Collections.singletonList(new CodeableConcept().addCoding(category)));
-		fhirCondition.setOnset(new DateTimeType().setValue(diagnosis.getDateCreated()));
-		fhirCondition.setRecordedDate(diagnosis.getDateCreated());
-		fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(diagnosis));
+		fhirCondition.addCategory(new CodeableConcept().addCoding(category));
+		fhirCondition.setRecordedDate(obs.getDateCreated());
+		fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(obs));
 		
 		return fhirCondition;
 	}

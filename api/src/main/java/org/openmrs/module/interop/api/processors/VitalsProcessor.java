@@ -10,16 +10,17 @@
 package org.openmrs.module.interop.api.processors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Observation;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.fhir2.api.translators.ConceptTranslator;
+import org.openmrs.module.fhir2.api.translators.ObservationTranslator;
 import org.openmrs.module.interop.InteropConstant;
 import org.openmrs.module.interop.api.InteropProcessor;
-import org.openmrs.module.interop.api.processors.translators.ConditionObsTranslator;
+import org.openmrs.module.interop.utils.ReferencesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -27,29 +28,24 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@Component("interop.conditionBroker")
-public class ConditionProcessor implements InteropProcessor<Encounter> {
+@Component("interop.vitalsProcessor")
+public class VitalsProcessor implements InteropProcessor<Encounter> {
 	
 	@Autowired
-	private ConceptTranslator conceptTranslator;
-	
-	@Autowired
-	@Qualifier("interop.conditions")
-	private ConditionObsTranslator conditionObsTranslator;
+	private ObservationTranslator observationTranslator;
 	
 	@Override
 	public List<String> encounterTypes() {
-		
 		return Arrays.asList(Context.getAdministrationService()
-		        .getGlobalPropertyValue(InteropConstant.CONDITION_BROKER_ENCOUNTER_TYPE_UUIDS, "").split(","));
+		        .getGlobalPropertyValue(InteropConstant.VITALS_PROCESSOR_ENCOUNTER_TYPE_UUIDS, "").split(","));
 	}
 	
 	@Override
 	public List<String> questions() {
-		String conditionString = Context.getAdministrationService()
-		        .getGlobalPropertyValue(InteropConstant.CONDITIONS_CONCEPT_UUID, "");
+		String vitalstString = Context.getAdministrationService().getGlobalPropertyValue(InteropConstant.VITAL_CONCEPT_UUIDS,
+		    "");
 		
-		return Arrays.asList(conditionString.split(","));
+		return Arrays.asList(vitalstString.split(","));
 	}
 	
 	@Override
@@ -58,27 +54,30 @@ public class ConditionProcessor implements InteropProcessor<Encounter> {
 	}
 	
 	@Override
-	public List<Condition> process(Encounter encounter) {
-		List<Obs> allObs = new ArrayList<>(encounter.getAllObs());
+	public List<Observation> process(Encounter encounter) {
+		List<Obs> encounterObs = new ArrayList<>(encounter.getAllObs());
 		
-		List<Obs> conditionsObs = new ArrayList<>();
+		List<Obs> vitalObs = new ArrayList<>();
 		if (validateEncounterType(encounter)) {
-			allObs.forEach(obs -> {
+			encounterObs.forEach(obs -> {
 				if (validateConceptQuestions(obs)) {
-					conditionsObs.add(obs);
+					vitalObs.add(obs);
 				}
 			});
 		}
 		
-		List<Condition> conditions = new ArrayList<>();
-		if (!conditionsObs.isEmpty()) {
-			conditionsObs.forEach(obs -> {
-				Condition condition = conditionObsTranslator.toFhirResource(obs);
-				conditions.add(condition);
-			});
+		List<Observation> vitals = new ArrayList<>();
+		if (!vitalObs.isEmpty()) {
+			for (Obs obs : vitalObs) {
+				Observation observation = observationTranslator.toFhirResource(obs);
+				observation.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+				observation.addCategory(new CodeableConcept().addCoding(
+				    new Coding("http://terminology.hl7.org/CodeSystem/observation-category", "vital-signs", "Vital Signs")));
+				vitals.add(observation);
+			}
 		}
 		
-		return conditions;
+		return vitals;
 	}
 	
 	private boolean validateEncounterType(Encounter encounter) {
@@ -88,5 +87,4 @@ public class ConditionProcessor implements InteropProcessor<Encounter> {
 	private boolean validateConceptQuestions(Obs conceptObs) {
 		return questions().contains(conceptObs.getConcept().getUuid());
 	}
-	
 }
