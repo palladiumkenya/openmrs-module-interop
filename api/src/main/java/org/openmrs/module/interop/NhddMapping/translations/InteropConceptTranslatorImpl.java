@@ -30,9 +30,9 @@ import org.openmrs.module.interop.NhddMapping.CsvUtil.NHDDConceptMapDTO;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-@Slf4j
-@Primary
-@Component
+//@Slf4j
+//@Primary
+//@Component
 public class InteropConceptTranslatorImpl extends ConceptTranslatorImpl {
 	
 	List<NHDDConceptMapDTO> concepts = new ArrayList<>();

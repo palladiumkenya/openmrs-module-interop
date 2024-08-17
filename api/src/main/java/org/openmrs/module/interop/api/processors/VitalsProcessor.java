@@ -56,24 +56,17 @@ public class VitalsProcessor implements InteropProcessor<Encounter> {
 	@Override
 	public List<Observation> process(Encounter encounter) {
 		List<Obs> encounterObs = new ArrayList<>(encounter.getAllObs());
-		
-		List<Obs> vitalObs = new ArrayList<>();
-		if (validateEncounterType(encounter)) {
-			encounterObs.forEach(obs -> {
-				if (validateConceptQuestions(obs)) {
-					vitalObs.add(obs);
-				}
-			});
-		}
-		
 		List<Observation> vitals = new ArrayList<>();
-		if (!vitalObs.isEmpty()) {
-			for (Obs obs : vitalObs) {
-				Observation observation = observationTranslator.toFhirResource(obs);
-				observation.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
-				observation.addCategory(new CodeableConcept().addCoding(
-				    new Coding("http://terminology.hl7.org/CodeSystem/observation-category", "vital-signs", "Vital Signs")));
-				vitals.add(observation);
+		
+		if (!encounterObs.isEmpty()) {
+			if (validateEncounterType(encounter)) {
+				for (Obs obs : encounterObs) {
+					Observation observation = observationTranslator.toFhirResource(obs);
+					observation.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
+					observation.addCategory(new CodeableConcept().addCoding(new Coding(
+					        "http://terminology.hl7.org/CodeSystem/observation-category", "vital-signs", "Vital Signs")));
+					vitals.add(observation);
+				}
 			}
 		}
 		
