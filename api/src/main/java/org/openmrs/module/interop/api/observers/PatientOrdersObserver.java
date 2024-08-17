@@ -12,14 +12,16 @@ package org.openmrs.module.interop.api.observers;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Medication;
 import org.hl7.fhir.r4.model.MedicationRequest;
-import org.openmrs.Drug;
+import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openmrs.DrugOrder;
 import org.openmrs.Order;
+import org.openmrs.TestOrder;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
 import org.openmrs.event.Event;
 import org.openmrs.module.fhir2.api.translators.MedicationRequestTranslator;
 import org.openmrs.module.fhir2.api.translators.MedicationTranslator;
+import org.openmrs.module.fhir2.api.translators.ServiceRequestTranslator;
 import org.openmrs.module.interop.api.Subscribable;
 import org.openmrs.module.interop.api.metadata.EventMetadata;
 import org.openmrs.module.interop.utils.ObserverUtils;
@@ -32,13 +34,16 @@ import java.util.List;
 
 @Slf4j
 @Component("interop.drugOrderObserver")
-public class DrugOrderObserver extends BaseObserver implements Subscribable<Order> {
+public class PatientOrdersObserver extends BaseObserver implements Subscribable<Order> {
 	
 	@Autowired
 	private MedicationRequestTranslator medicationRequestTranslator;
 	
 	@Autowired
 	private MedicationTranslator medicationTranslator;
+	
+	@Autowired
+	private ServiceRequestTranslator<TestOrder> testOrderServiceRequestTranslator;
 	
 	@Override
 	public Class<?> clazz() {
@@ -53,13 +58,14 @@ public class DrugOrderObserver extends BaseObserver implements Subscribable<Orde
 	@Override
 	public void onMessage(Message message) {
 		processMessage(message)
-		        .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareDrugMessage(metadata), getDaemonToken()));
+		        .ifPresent(metadata -> Daemon.runInDaemonThread(() -> prepareOrderMessage(metadata), getDaemonToken()));
 	}
 	
-	private void prepareDrugMessage(@NotNull EventMetadata metadata) {
-		Order drugOrder = Context.getOrderService().getOrderByUuid(metadata.getString("uuid"));
-		if (drugOrder.getOrderType().getUuid().equals("131168f4-15f5-102d-96e4-000c29c2a5d7")) {
-			DrugOrder order = (DrugOrder) drugOrder;
+	private void prepareOrderMessage(@NotNull EventMetadata metadata) {
+		Order createdOrder = Context.getOrderService().getOrderByUuid(metadata.getString("uuid"));
+		
+		if (createdOrder.getOrderType().getUuid().equals("131168f4-15f5-102d-96e4-000c29c2a5d7")) {
+			DrugOrder order = (DrugOrder) createdOrder;
 			Medication medication = null;
 			if (order.getDrug() != null) {
 				medication = medicationTranslator.toFhirResource(order.getDrug());
@@ -72,6 +78,12 @@ public class DrugOrderObserver extends BaseObserver implements Subscribable<Orde
 				this.publish(medicationRequest);
 			} else {
 				log.error("Couldn't find allergy with UUID {} ", metadata.getString("uuid"));
+			}
+		} else if (createdOrder.getOrderType().getUuid().equals("52a447d3-a64a-11e3-9aeb-50e549534c5e")) {
+			TestOrder testOrder = (TestOrder) createdOrder;
+			ServiceRequest translatedOrder = testOrderServiceRequestTranslator.toFhirResource(testOrder);
+			if (translatedOrder != null) {
+				this.publish(translatedOrder);
 			}
 		}
 	}
