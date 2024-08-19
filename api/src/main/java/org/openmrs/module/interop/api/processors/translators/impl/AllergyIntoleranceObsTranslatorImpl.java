@@ -37,7 +37,6 @@ import java.util.List;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-@Component("interop.allergyIntolerance")
 public class AllergyIntoleranceObsTranslatorImpl implements AllergyIntoleranceObsTranslator {
 	
 	private static String CLINICAL_STATUS_SYSTEM = "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical";

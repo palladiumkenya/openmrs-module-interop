@@ -27,7 +27,6 @@ import java.util.Date;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-@Component("interop.conditions")
 public class ConditionObsTranslatorImpl implements ConditionObsTranslator {
 	
 	@Autowired

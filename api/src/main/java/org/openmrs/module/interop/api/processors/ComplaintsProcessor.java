@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@Component("interop.complaintsProcessor")
 public class ComplaintsProcessor implements InteropProcessor<Encounter> {
 	
 	@Autowired

@@ -29,7 +29,6 @@ import javax.annotation.Nonnull;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-@Component("interop.appointmentRequestTranslator")
 public class AppointmentRequestTranslatorImpl implements AppointmentRequestTranslator {
 	
 	@Autowired

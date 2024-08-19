@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Slf4j
-@Component("interop.serviceRequestProcessor")
 public class ServiceRequestProcessor implements InteropProcessor<Encounter> {
 	
 	@Autowired
