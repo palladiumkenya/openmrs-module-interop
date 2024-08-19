@@ -96,5 +96,9 @@ public class InteropConstant {
 	public static final String GP_SHR_OAUTH2_CLIENT_SECRET = "interop.shr.oauth2.client.secret";
 	
 	public static final String GP_SHR_OAUTH2_SCOPE = "interop.shr.oauth2.scope";
-	
+
+	public static final String OAUTH_USERNAME = "interop.shr.oauth.username";
+
+	public static final String OAUTH_PASSWORD = "interop.shr.oauth.password";
+
 }
