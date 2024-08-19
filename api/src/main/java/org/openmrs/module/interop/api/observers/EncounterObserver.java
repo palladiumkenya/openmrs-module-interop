@@ -151,7 +151,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		bundleEntryRequestComponent.setUrl("Encounter/" + fhirEncounter.getId());
 		encounterBundleEntryComponent.setRequest(bundleEntryRequestComponent);
 		encounterBundleEntryComponent.setResource(fhirEncounter);
-		//		preparedBundle.addEntry(encounterBundleEntryComponent);
+		preparedBundle.addEntry(encounterBundleEntryComponent);
 		
 		/* Todo: Specify which observations to include */
 		//Observations
@@ -162,12 +162,12 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		for (Obs obs : encounterObservations) {
 			Observation fhirObs = observationTranslator.toFhirResource(obs);
 			fhirObs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
-
+		
 			// provence references
 			List<Resource> resources = ReferencesUtil.resolveProvenceReference(fhirObs.getContained(), encounter);
 			fhirObs.getContained().clear();
 			//fhirObs.setContained(resources);
-
+		
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
 			requestComponent.setMethod(Bundle.HTTPVerb.PUT);
@@ -215,7 +215,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		}
 		
 		//Lab results obs
-		List<Observation> labResultsObs = labResultsProcessor.process(encounter);
+		List<Observation> labResultsObs = new ArrayList<>(); // labResultsProcessor.process(encounter);
 		for (Observation obs : labResultsObs) {
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
@@ -406,14 +406,14 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			allergy.setPatient(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			allergy.setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
 			bundle.addEntry(createAllergyComponent(allergy));
-		});*/
+		});
 		
 		List<ServiceRequest> serviceRequests = serviceRequestProcessor.process(encounter);
 		if (!serviceRequests.isEmpty()) {
 			serviceRequests.get(0).setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			serviceRequests.get(0).setEncounter(encounterReferenceTranslator.toFhirResource(encounter));
 			bundle.addEntry(createServiceRequestBundleComponent(serviceRequests.get(0)));
-		}
+		}; */
 		
 		//		if (!buildCancerScreeningReferralInfo(encounter).isEmpty()) {
 		//			for (Bundle.BundleEntryComponent component : buildCancerScreeningReferralInfo(encounter)) {
