@@ -74,37 +74,31 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 	@Autowired
 	private ObservationTranslator observationTranslator;
 	
-	@Autowired
 	private ConditionProcessor conditionProcessor;
 	
-	@Autowired
 	private DiagnosisProcessor diagnosisProcessor;
 	
-	@Autowired
 	@Qualifier("interop.appointmentProcessor")
 	private AppointmentProcessor appointmentProcessor;
 	
-	@Autowired
 	@Qualifier("interop.appointmentRequestTranslator")
 	private AppointmentRequestTranslator appointmentRequestTranslator;
 	
 	@Autowired
 	private DiagnosticReportProcessor diagnosticReportProcessor;
 	
-	@Autowired
 	private AllergyIntoleranceProcessor allergyIntoleranceProcessor;
 	
 	@Autowired
 	private VitalsProcessor vitalsProcessor;
 	
-	@Autowired
 	private ComplaintsProcessor complaintsProcessor;
 	
-	@Autowired
 	private ServiceRequestProcessor serviceRequestProcessor;
 	
 	@Autowired
 	private ConceptTranslator conceptTranslator;
+	
 	private LabResultsProcessor labResultsProcessor;
 	
 	@Override
@@ -203,7 +197,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		}
 		
 		//Complaints obs
-		List<Observation> complaintsObs = complaintsProcessor.process(encounter);
+		/*List<Observation> complaintsObs = complaintsProcessor.process(encounter);
 		for (Observation obs : complaintsObs) {
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
@@ -212,7 +206,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 			obsBundleEntry.setRequest(requestComponent);
 			obsBundleEntry.setResource(obs);
 			preparedBundle.addEntry(obsBundleEntry);
-		}
+		}*/
 		
 		//Lab results obs
 		List<Observation> labResultsObs = new ArrayList<>(); // labResultsProcessor.process(encounter);

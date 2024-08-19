@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@Component("interop.conditionBroker")
 public class ConditionProcessor implements InteropProcessor<Encounter> {
 	
 	@Autowired

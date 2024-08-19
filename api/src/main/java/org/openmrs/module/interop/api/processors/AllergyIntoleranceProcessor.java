@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@Component("interop.allergyIntoleranceBroker")
 public class AllergyIntoleranceProcessor implements InteropProcessor<Encounter> {
 	
 	@Autowired

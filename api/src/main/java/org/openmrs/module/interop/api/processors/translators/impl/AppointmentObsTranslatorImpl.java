@@ -33,7 +33,6 @@ import java.util.Date;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-@Component("interop.appointments")
 public class AppointmentObsTranslatorImpl implements AppointmentObsTranslator {
 	
 	@Autowired
