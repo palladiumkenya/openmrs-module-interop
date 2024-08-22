@@ -15,6 +15,7 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.ServiceRequest;
 import org.openmrs.DrugOrder;
 import org.openmrs.Order;
+import org.openmrs.Patient;
 import org.openmrs.TestOrder;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
@@ -25,6 +26,7 @@ import org.openmrs.module.fhir2.api.translators.ServiceRequestTranslator;
 import org.openmrs.module.interop.api.Subscribable;
 import org.openmrs.module.interop.api.metadata.EventMetadata;
 import org.openmrs.module.interop.utils.ObserverUtils;
+import org.openmrs.module.interop.utils.ReferencesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -75,6 +77,12 @@ public class PatientOrdersObserver extends BaseObserver implements Subscribable<
 				if (medication != null) {
 					this.publish(medication);
 				}
+				String reference = medicationRequest.getSubject().getReference();
+				String arr[] = reference.split("/");
+				if (arr.length == 2) {
+					Patient patient = Context.getPatientService().getPatientByUuid(arr[1]);
+					medicationRequest.setSubject(ReferencesUtil.buildPatientReference(patient));
+				}
 				this.publish(medicationRequest);
 			} else {
 				log.error("Couldn't find allergy with UUID {} ", metadata.getString("uuid"));
@@ -83,6 +91,13 @@ public class PatientOrdersObserver extends BaseObserver implements Subscribable<
 			TestOrder testOrder = (TestOrder) createdOrder;
 			ServiceRequest translatedOrder = testOrderServiceRequestTranslator.toFhirResource(testOrder);
 			if (translatedOrder != null) {
+				
+				String reference = translatedOrder.getSubject().getReference();
+				String arr[] = reference.split("/");
+				if (arr.length == 2) {
+					Patient patient = Context.getPatientService().getPatientByUuid(arr[1]);
+					translatedOrder.setSubject(ReferencesUtil.buildPatientReference(patient));
+				}
 				this.publish(translatedOrder);
 			}
 		}
