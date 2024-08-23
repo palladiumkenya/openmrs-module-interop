@@ -38,8 +38,7 @@ public class OpenhimConnector implements Publisher {
 		try {
 			OpenhimConfiguration config = Context.getRegisteredComponent("interop.openhimConfiguration",
 			    OpenhimConfiguration.class);
-			OpenhimClient.postFhirResource(encodeResourceString,
-			    config.getOpenhimServerUrl() + "/" + resource.fhirType().toLowerCase(), serverToken);
+			OpenhimClient.postFhirResource(encodeResourceString, config.getOpenhimServerUrl() + "/Bundle", serverToken);
 		}
 		catch (Exception e) {
 			log.error("Unable to post fhir resource", e);

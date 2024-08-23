@@ -187,6 +187,7 @@ public class EncounterObserver extends BaseObserver implements Subscribable<org.
 		//Vital obs
 		List<Observation> vitalsObs = vitalsProcessor.process(encounter);
 		for (Observation obs : vitalsObs) {
+			obs.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 			Bundle.BundleEntryComponent obsBundleEntry = new Bundle.BundleEntryComponent();
 			Bundle.BundleEntryRequestComponent requestComponent = new Bundle.BundleEntryRequestComponent();
 			requestComponent.setMethod(Bundle.HTTPVerb.PUT);

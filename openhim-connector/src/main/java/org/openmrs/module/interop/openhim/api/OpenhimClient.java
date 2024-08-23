@@ -20,7 +20,7 @@ public class OpenhimClient {
 	public static void postFhirResource(String fhirResource, String openHimUrl, String oauthToken) throws Exception {
 		HttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(openHimUrl);
-		oauthToken = "Bearer " + oauthToken;
+		oauthToken = "Basic " + oauthToken;
 		
 		/* Todo: Add Oauth2 logic and append to request headers */
 		StringEntity fhirResourceEntity = new StringEntity(fhirResource);

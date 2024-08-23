@@ -12,6 +12,7 @@ package org.openmrs.module.interop.api.observers;
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Diagnosis;
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
 import org.openmrs.event.Event;
@@ -19,6 +20,7 @@ import org.openmrs.module.interop.api.Subscribable;
 import org.openmrs.module.interop.api.metadata.EventMetadata;
 import org.openmrs.module.interop.api.processors.translators.InteropConditionTranslator;
 import org.openmrs.module.interop.utils.ObserverUtils;
+import org.openmrs.module.interop.utils.ReferencesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +57,12 @@ public class DiagnosisObserver extends BaseObserver implements Subscribable<Diag
 			return;
 		org.hl7.fhir.r4.model.Condition fhirCondition = diagnosisTranslator.toFhirResource(diagnosis);
 		if (fhirCondition != null) {
+			String reference = fhirCondition.getSubject().getReference();
+			String arr[] = reference.split("/");
+			if (arr.length == 2) {
+				Patient patient = Context.getPatientService().getPatientByUuid(arr[1]);
+				fhirCondition.setSubject(ReferencesUtil.buildPatientReference(patient));
+			}
 			this.publish(fhirCondition);
 		} else {
 			log.error("Couldn't find diagnosis with UUID {} ", metadata.getString("uuid"));

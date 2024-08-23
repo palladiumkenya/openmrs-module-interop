@@ -124,7 +124,7 @@ public abstract class BaseObserver {
 			// Publish to enabled connectors
 			if (newInstancePublisher.isEnabled()) {
 				log.info("Publishing resource with ID {} to {}", resource.getId(), publisher.getSimpleName());
-				newInstancePublisher.publish(fhirContext, resource, oauthUtil.getToken());
+				newInstancePublisher.publish(fhirContext, resource, oauthUtil.getBasicAuthToken());
 			}
 		});
 	}

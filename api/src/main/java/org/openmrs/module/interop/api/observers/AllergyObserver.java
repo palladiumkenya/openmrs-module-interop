@@ -11,12 +11,15 @@ package org.openmrs.module.interop.api.observers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.Allergy;
+import org.openmrs.Patient;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
 import org.openmrs.event.Event;
 import org.openmrs.module.fhir2.api.FhirAllergyIntoleranceService;
 import org.openmrs.module.interop.api.Subscribable;
 import org.openmrs.module.interop.api.metadata.EventMetadata;
 import org.openmrs.module.interop.utils.ObserverUtils;
+import org.openmrs.module.interop.utils.ReferencesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +55,15 @@ public class AllergyObserver extends BaseObserver implements Subscribable<Allerg
 		        .get(metadata.getString("uuid"));
 		if (allergyIntolerance != null && !allergyIntolerance.getReaction().isEmpty()
 		        && !(allergyIntolerance.getReactionFirstRep().getManifestation().isEmpty())) {
+			if (allergyIntolerance.getPatient() != null) {
+				String reference = allergyIntolerance.getPatient().getReference();
+				
+				String arr[] = reference.split("/");
+				if (arr.length == 2) {
+					Patient patient = Context.getPatientService().getPatientByUuid(arr[1]);
+					allergyIntolerance.setPatient(ReferencesUtil.buildPatientReference(patient));
+				}
+			}
 			this.publish(allergyIntolerance);
 		} else {
 			log.error("Couldn't find allergy with UUID {} or resource missing required properties",
