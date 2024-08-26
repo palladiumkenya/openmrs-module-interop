@@ -12,6 +12,7 @@ package org.openmrs.module.interop.api.processors.translators.impl;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Identifier;
 import org.openmrs.Auditable;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
@@ -56,6 +57,12 @@ public class ConditionObsTranslatorImpl implements ConditionObsTranslator {
 		fhirCondition.addCategory(new CodeableConcept().addCoding(category));
 		fhirCondition.setRecordedDate(obs.getDateCreated());
 		fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(obs));
+
+		Identifier identifier = new Identifier();
+		identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
+		identifier.setSystem("https://shr.kenya-hie.health");
+		identifier.setValue(obs.getUuid());
+		fhirCondition.addIdentifier(identifier);
 		
 		return fhirCondition;
 	}

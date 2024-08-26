@@ -167,7 +167,7 @@ public class ReferencesUtil {
 		}
 		return "";
 	}
-
+	
 	private static String getPatientCRID(Patient patient) {
 		if (ObserverUtils.getCRIDIdentifierType() != null) {
 			List<PatientIdentifier> crId = patient.getActiveIdentifiers().stream()
