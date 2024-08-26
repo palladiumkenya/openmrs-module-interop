@@ -16,6 +16,8 @@ public class InteropConstant {
 	public static final String GP_ENABLE_OPENHIM = "interop.enableOpenHIM";
 	
 	public static final String NATIONAL_UNIQUE_PATIENT_NUMBER_UUID = "interop.nupi.patientIdentifierTypeUuid";
+
+	public static final String SOCIAL_HEALTH_AUTHORITY_IDENTIFICATION_NUMBER_UUID = "interop.crid.patientIdentifierTypeUuid";
 	
 	public static final String INTEROP_MFLCODE_LOCATION_ATTRIBUTE_TYPE_UUID = "interop.mflcode.locationAttributeTypeUuid";
 	

@@ -115,6 +115,11 @@
 		<defaultValue>f85081e2-b4be-4e48-b3a4-7994b69bb101</defaultValue>
 	</globalProperty>
 	<globalProperty>
+		<property>@MODULE_ID@.crid.patientIdentifierTypeUuid</property>
+		<description>social health authority identification number</description>
+		<defaultValue>24aedd37-b5be-4e08-8311-3721b8d5100d</defaultValue>
+	</globalProperty>
+	<globalProperty>
 		<property>@MODULE_ID@.practitionerAttributeTypeUuid</property>
 		<description>Practitioner UUID</description>
 		<defaultValue>186bbf06787-268338a2-1e78-4b18-93cc-22f240d6fc37</defaultValue>
@@ -272,7 +277,7 @@
 	<globalProperty>
 		<property>@MODULE_ID@.cr.system.url.configuration</property>
 		<description>CR System Configuration URL</description>
-		<defaultValue>https://dhpstagingapi.health.go.ke/partners/registry/search/upi/</defaultValue>
+		<defaultValue>https://sandbox.kenya-hie.health/api/v4/Patient</defaultValue>
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.kmhfl.system.url.configuration</property>
