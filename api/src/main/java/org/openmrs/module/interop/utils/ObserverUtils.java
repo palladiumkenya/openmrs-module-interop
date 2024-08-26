@@ -44,6 +44,12 @@ public class ObserverUtils {
 		return Context.getPatientService().getPatientIdentifierTypeByUuid(NUPIIdentifierType);
 	}
 	
+	public static PatientIdentifierType getCRIDIdentifierType() {
+		String CRIDIdentifierType = Context.getAdministrationService()
+		        .getGlobalPropertyValue(InteropConstant.SOCIAL_HEALTH_AUTHORITY_IDENTIFICATION_NUMBER_UUID, "");
+		return Context.getPatientService().getPatientIdentifierTypeByUuid(CRIDIdentifierType);
+	}
+	
 	public static LocationAttributeType getMFLCODELocationAttributeType() {
 		String MFLCODELocationAttributeType = Context.getAdministrationService()
 		        .getGlobalPropertyValue(InteropConstant.INTEROP_MFLCODE_LOCATION_ATTRIBUTE_TYPE_UUID, "");

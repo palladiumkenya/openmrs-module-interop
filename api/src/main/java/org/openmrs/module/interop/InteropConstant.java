@@ -17,6 +17,8 @@ public class InteropConstant {
 	
 	public static final String NATIONAL_UNIQUE_PATIENT_NUMBER_UUID = "interop.nupi.patientIdentifierTypeUuid";
 	
+	public static final String SOCIAL_HEALTH_AUTHORITY_IDENTIFICATION_NUMBER_UUID = "interop.crid.patientIdentifierTypeUuid";
+	
 	public static final String INTEROP_MFLCODE_LOCATION_ATTRIBUTE_TYPE_UUID = "interop.mflcode.locationAttributeTypeUuid";
 	
 	public static final String INTEROP_PROVIDER_ATTRIBUTE_TYPE_UUID = "interop.practitionerAttributeTypeUuid";
@@ -96,9 +98,9 @@ public class InteropConstant {
 	public static final String GP_SHR_OAUTH2_CLIENT_SECRET = "interop.shr.oauth2.client.secret";
 	
 	public static final String GP_SHR_OAUTH2_SCOPE = "interop.shr.oauth2.scope";
-
+	
 	public static final String OAUTH_USERNAME = "interop.shr.oauth.username";
-
+	
 	public static final String OAUTH_PASSWORD = "interop.shr.oauth.password";
-
+	
 }

@@ -137,11 +137,13 @@ public class ReferencesUtil {
 	}
 	
 	public static Reference buildPatientReference(@NotNull Patient patient) {
-		Reference reference = new Reference("Patient/" + getPatientNUPI(patient)).setType("Patient");
+		// Reference reference = new Reference("Patient/" + getPatientNUPI(patient)).setType("Patient");
+		Reference reference = new Reference("Patient/" + getPatientCRID(patient)).setType("Patient");
 		Identifier identifier = new Identifier();
 		identifier.setSystem(ObserverUtils.getCRSystemUrlConfiguration());
 		identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
-		identifier.setValue(getPatientNUPI(patient));
+		// identifier.setValue(getPatientNUPI(patient));
+		identifier.setValue(getPatientCRID(patient));
 		reference.setIdentifier(identifier);
 		return reference;
 	}
@@ -162,6 +164,16 @@ public class ReferencesUtil {
 			        .filter(id -> id.getIdentifierType().getUuid().equals(ObserverUtils.getNUPIIdentifierType().getUuid()))
 			        .collect(Collectors.toList());
 			return nUpi.isEmpty() ? "" : nUpi.get(0).getIdentifier();
+		}
+		return "";
+	}
+	
+	private static String getPatientCRID(Patient patient) {
+		if (ObserverUtils.getCRIDIdentifierType() != null) {
+			List<PatientIdentifier> crId = patient.getActiveIdentifiers().stream()
+			        .filter(id -> id.getIdentifierType().getUuid().equals(ObserverUtils.getCRIDIdentifierType().getUuid()))
+			        .collect(Collectors.toList());
+			return crId.isEmpty() ? "" : crId.get(0).getIdentifier();
 		}
 		return "";
 	}
