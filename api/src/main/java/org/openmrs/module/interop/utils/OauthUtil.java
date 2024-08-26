@@ -167,12 +167,18 @@ public class OauthUtil {
 	}
 	
 	public String getBasicAuthToken() {
-		GlobalProperty username = Context.getAdministrationService().getGlobalPropertyObject(InteropConstant.OAUTH_USERNAME);
+		GlobalProperty gpUsername = Context.getAdministrationService()
+		        .getGlobalPropertyObject(InteropConstant.OAUTH_USERNAME);
 		
-		GlobalProperty password = Context.getAdministrationService().getGlobalPropertyObject(InteropConstant.OAUTH_PASSWORD);
+		GlobalProperty gpPassword = Context.getAdministrationService()
+		        .getGlobalPropertyObject(InteropConstant.OAUTH_PASSWORD);
 		
-		String authString = username + ":" + password;
-		String encodedAuthString = Base64.getEncoder().encodeToString(authString.getBytes());
+		String username = gpUsername.getPropertyValue().trim();
+		String password = gpPassword.getPropertyValue().trim();
+		System.err.println("Interop: Got user as: " + username);
+		System.err.println("Interop: Got pass as: " + password);
+		String encodedAuthString = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+		System.err.println("Interop: Got openhim auth as : " + encodedAuthString);
 		
 		return encodedAuthString;
 	}

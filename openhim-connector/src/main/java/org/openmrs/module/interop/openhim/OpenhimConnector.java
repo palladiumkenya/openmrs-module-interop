@@ -26,6 +26,7 @@ public class OpenhimConnector implements Publisher {
 	
 	@Override
 	public void publish(@NotNull FhirContext context, @NotNull IAnyResource resource, String serverToken) {
+		System.err.println("Interop: Using server token: " + serverToken);
 		log.debug("publish resource with ID {}", resource.getId());
 		String encodeResourceString = "";
 		if (context != null) {
