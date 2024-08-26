@@ -12,6 +12,7 @@ package org.openmrs.module.interop.api.processors;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Observation;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
@@ -65,6 +66,11 @@ public class VitalsProcessor implements InteropProcessor<Encounter> {
 					observation.setSubject(ReferencesUtil.buildPatientReference(encounter.getPatient()));
 					observation.addCategory(new CodeableConcept().addCoding(new Coding(
 					        "http://terminology.hl7.org/CodeSystem/observation-category", "vital-signs", "Vital Signs")));
+					Identifier identifier = new Identifier();
+					identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
+					identifier.setSystem("https://shr.kenya-hie.health");
+					identifier.setValue(obs.getUuid());
+					observation.addIdentifier(identifier);
 					vitals.add(observation);
 				}
 			}
