@@ -30,7 +30,12 @@ public class OpenhimConfiguration {
 		if (baseUrl == null || suffixUrl == null) {
 			throw new IllegalArgumentException("OpenHIM URL is invalid: baseUrl or suffixUrl is null");
 		}
-		return baseUrl + suffixUrl;
+		String serverUrl = baseUrl.trim() + suffixUrl.trim();
+		// remove any trailing '/'
+		if (serverUrl.endsWith("/")) {
+			serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
+		}
+		return serverUrl;
 	}
 	
 	private String getOpenhimBaseUrl() {
