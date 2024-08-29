@@ -26,6 +26,7 @@ public class OpenhimConnector implements Publisher {
 	
 	@Override
 	public void publish(@NotNull FhirContext context, @NotNull IAnyResource resource, String serverToken) {
+		System.err.println("Interop: Using server token: " + serverToken);
 		log.debug("publish resource with ID {}", resource.getId());
 		String encodeResourceString = "";
 		if (context != null) {
@@ -38,10 +39,16 @@ public class OpenhimConnector implements Publisher {
 		try {
 			OpenhimConfiguration config = Context.getRegisteredComponent("interop.openhimConfiguration",
 			    OpenhimConfiguration.class);
-			OpenhimClient.postFhirResource(encodeResourceString, config.getOpenhimServerUrl() + "/Bundle", serverToken);
+			// Get the resource type
+			String resourceType = resource.getClass().getSimpleName();
+			System.err.println("Interop: got resource type as: " + resourceType);
+			OpenhimClient.postFhirResource(encodeResourceString, config.getOpenhimServerUrl() + "/" + resourceType,
+			    serverToken);
 		}
 		catch (Exception e) {
 			log.error("Unable to post fhir resource", e);
+			System.err.println("Interop: Unable to post fhir resource: " + e.getMessage());
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}

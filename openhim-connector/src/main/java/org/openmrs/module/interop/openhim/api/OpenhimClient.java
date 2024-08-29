@@ -14,6 +14,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 public class OpenhimClient {
 	
@@ -24,6 +25,9 @@ public class OpenhimClient {
 		
 		/* Todo: Add Oauth2 logic and append to request headers */
 		StringEntity fhirResourceEntity = new StringEntity(fhirResource);
+		System.err.println("Interop: Posting to server Auth: " + oauthToken);
+		System.err.println("Interop: Posting to server URL: " + openHimUrl);
+		System.err.println("Interop: Posting to server Payload: " + fhirResource);
 		httpPost.setEntity(fhirResourceEntity);
 		httpPost.setHeader("Content-type", "application/json");
 		httpPost.setHeader("Authorization", oauthToken);
@@ -33,9 +37,9 @@ public class OpenhimClient {
 		if (statusCode >= 200 && statusCode < 300) {
 			System.out.println("FHIR resource was successfully posted to the OpenHIM channel");
 		} else {
-			String responseBody = response.getEntity().toString();
+			String reply = EntityUtils.toString(response.getEntity(), "UTF-8");
 			System.out.println("An error occurred while posting the FHIR resource to the OpenHIM channel. Status code: "
-			        + statusCode + " Response body: " + responseBody);
+			        + statusCode + " Response body: " + reply);
 		}
 	}
 }

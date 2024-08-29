@@ -57,7 +57,7 @@ public class ConditionObsTranslatorImpl implements ConditionObsTranslator {
 		fhirCondition.addCategory(new CodeableConcept().addCoding(category));
 		fhirCondition.setRecordedDate(obs.getDateCreated());
 		fhirCondition.getMeta().setLastUpdated(this.getLastUpdated(obs));
-
+		
 		Identifier identifier = new Identifier();
 		identifier.setUse(Identifier.IdentifierUse.OFFICIAL);
 		identifier.setSystem("https://shr.kenya-hie.health");
