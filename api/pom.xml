@@ -14,6 +14,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.openmrs.api</groupId>
+            <artifactId>openmrs-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>uiframework-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.openmrs</groupId>
             <artifactId>event-api</artifactId>
         </dependency>

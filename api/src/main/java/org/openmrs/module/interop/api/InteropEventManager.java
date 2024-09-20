@@ -37,6 +37,7 @@ public class InteropEventManager {
 			observer.setDaemonToken(getDaemonToken());
 			observer.actions().forEach(action -> {
 				log.debug("Registering observer on {} with event {}", observer.clazz(), action.name());
+				System.out.println("Registering observer on {} with event " + observer.clazz() + " : " + action.name());
 				Event.subscribe(observer.clazz(), action.name(), observer);
 			});
 		});

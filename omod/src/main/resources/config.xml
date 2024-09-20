@@ -309,5 +309,25 @@
 		<description>Oauth2 client scope</description>
 		<defaultValue></defaultValue>
 	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.rms.integration.enabled</property>
+		<description>Is RMS integration enabled</description>
+		<defaultValue>false</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.rms.integration.endpoint.url</property>
+		<description>RMS integration Endpoint URL</description>
+		<defaultValue>https://siaya.tsconect.com/api</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.rms.integration.username</property>
+		<description>RMS integration Username</description>
+		<defaultValue>test</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.rms.integration.password</property>
+		<description>RMS integration Password</description>
+		<defaultValue>test</defaultValue>
+	</globalProperty>
 	
 </module>
