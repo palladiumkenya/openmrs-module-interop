@@ -103,4 +103,12 @@ public class InteropConstant {
 	
 	public static final String OAUTH_PASSWORD = "interop.shr.oauth.password";
 	
+	public static final String RMS_SYNC_ENABLED = "interop.rms.integration.enabled";
+	
+	public static final String RMS_ENDPOINT_URL = "interop.rms.integration.endpoint.url";
+	
+	public static final String RMS_USERNAME = "interop.rms.integration.username";
+	
+	public static final String RMS_PASSWORD = "interop.rms.integration.password";
+	
 }

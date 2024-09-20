@@ -311,7 +311,7 @@
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.rms.integration.enabled</property>
-		<description>Is RMS integration enabled</description>
+		<description>Is RMS integration enabled - (true) = enabled, (false) = disabled</description>
 		<defaultValue>false</defaultValue>
 	</globalProperty>
 	<globalProperty>
@@ -322,12 +322,12 @@
 	<globalProperty>
 		<property>@MODULE_ID@.rms.integration.username</property>
 		<description>RMS integration Username</description>
-		<defaultValue>test</defaultValue>
+		<defaultValue>pdsl@gmail.com</defaultValue>
 	</globalProperty>
 	<globalProperty>
 		<property>@MODULE_ID@.rms.integration.password</property>
 		<description>RMS integration Password</description>
-		<defaultValue>test</defaultValue>
+		<defaultValue>password</defaultValue>
 	</globalProperty>
 	
 </module>
