@@ -27,14 +27,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class InteropActivator extends BaseModuleActivator implements ApplicationContextAware, DaemonTokenAware {
-	
+
 	@Autowired
 	private InteropEventManager eventManager;
-	
+
 	private static ApplicationContext applicationContext;
-	
+
 	private static DaemonToken daemonToken;
-	
+
 	/**
 	 * @see #started()
 	 */
@@ -42,24 +42,10 @@ public class InteropActivator extends BaseModuleActivator implements Application
 		applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
 		this.eventManager.setDaemonToken(daemonToken);
 		this.eventManager.enableEvents();
-		
-		//Verify only enabled publishers configured connections
-		for (Class<? extends Publisher> publisher : ClassUtils.getPublishers()) {
-			try {
-				Publisher newInstancePublisher = publisher.getDeclaredConstructor().newInstance();
-				if (newInstancePublisher.isEnabled()) {
-					if (newInstancePublisher.verifyConnection()) {
-						log.debug("{} verification was successful", publisher.getSimpleName());
-					}
-				}
-			}
-			catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			}
-		}
+
 		log.info("Started Interoperability Module");
 	}
-	
+
 	/**
 	 * @see #shutdown()
 	 */
@@ -68,12 +54,12 @@ public class InteropActivator extends BaseModuleActivator implements Application
 		this.eventManager.disableEvents();
 		log.info("Shutdown Interoperability Module");
 	}
-	
+
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		InteropActivator.applicationContext = applicationContext;
 	}
-	
+
 	@Override
 	public void setDaemonToken(DaemonToken token) {
 		InteropActivator.daemonToken = token;
